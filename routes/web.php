@@ -21,11 +21,15 @@ Route::get('/warung/{slug}', [CustomerController::class, 'showWarung'])->name('c
 |--------------------------------------------------------------------------
 */
 Route::controller(AuthController::class)->group(function () {
-    // Login & Register (Fix Error: Route register not defined)
+
+    // Login & Register
     Route::get('/login', 'showLogin')->name('login');
     Route::post('/login', 'login');
-    Route::get('/register', 'showRegister')->name('register'); // Tambahan biar ga error
+
+    Route::get('/register', 'showRegister')->name('register');
     Route::post('/register', 'register');
+
+    // Logout diarahkan ke method yang meredirect ke Welcome
     Route::post('/logout', 'logout')->name('logout');
 
     // Customer Login Khusus
@@ -39,66 +43,80 @@ Route::controller(AuthController::class)->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 3. ADMIN ROUTES (Manajemen Shelter)
+| 3. ADMIN ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function() {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    
-    // Kelola Pengguna
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
-    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
-    Route::get('/users/{id}/edit', [AdminController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{id}', [AdminController::class, 'update'])->name('users.update');
-    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    // Kelola Toko
-    Route::get('/shops', [AdminController::class, 'shops'])->name('shops');
-    Route::post('/shops/approve/{id}', [AdminController::class, 'approveShop'])->name('shops.approve');
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+        // Users
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+        Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+        Route::get('/users/{id}/edit', [AdminController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}', [AdminController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
+
+        // Shops
+        Route::get('/shops', [AdminController::class, 'shops'])->name('shops');
+        Route::post('/shops/approve/{id}', [AdminController::class, 'approveShop'])->name('shops.approve');
 });
 
 /*
 |--------------------------------------------------------------------------
-| 4. OWNER ROUTES (Manajemen Stan/Toko)
+| 4. OWNER ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function() {
-    Route::get('/dashboard', [OwnerController::class, 'dashboard'])->name('dashboard');
+Route::middleware(['auth', 'role:owner'])
+    ->prefix('owner')
+    ->name('owner.')
+    ->group(function () {
 
-    // CRUD Produk (Sudah disederhanakan)
-    Route::controller(OwnerController::class)->group(function() {
-        Route::get('/produk', 'produk')->name('produk');
-        Route::get('/produk/create', 'create')->name('produk.create');
-        Route::post('/produk', 'store')->name('produk.store');
-        Route::get('/produk/{id}/edit', 'edit')->name('produk.edit');
-        Route::put('/produk/{id}', 'update')->name('produk.update');
-        Route::delete('/produk/{id}', 'destroy')->name('produk.destroy');
+        Route::get('/dashboard', [OwnerController::class, 'dashboard'])->name('dashboard');
 
-        // Pengaturan Toko
-        Route::get('/pengaturan', 'pengaturan')->name('pengaturan');
-        Route::put('/pengaturan/update', 'updatePengaturan')->name('pengaturan.update');
-        Route::post('/toko/store', 'storeToko')->name('toko.store');
-    });
+        Route::controller(OwnerController::class)->group(function () {
+
+            // Produk
+            Route::get('/produk', 'produk')->name('produk');
+            Route::get('/produk/create', 'create')->name('produk.create');
+            Route::post('/produk', 'store')->name('produk.store');
+            Route::get('/produk/{id}/edit', 'edit')->name('produk.edit');
+            Route::put('/produk/{id}', 'update')->name('produk.update');
+            Route::delete('/produk/{id}', 'destroy')->name('produk.destroy');
+
+            // Pengaturan
+            Route::get('/pengaturan', 'pengaturan')->name('pengaturan');
+            Route::put('/pengaturan/update', 'updatePengaturan')->name('pengaturan.update');
+
+            // Toko
+            Route::post('/toko/store', 'storeToko')->name('toko.store');
+        });
 });
 
 /*
 |--------------------------------------------------------------------------
-| 5. CUSTOMER ROUTES (Belanja & Transaksi)
+| 5. CUSTOMER ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:customer'])->group(function() {
+Route::middleware(['auth', 'role:customer'])->group(function () {
+
     Route::get('/home', [CustomerController::class, 'index'])->name('customer.home');
     Route::get('/profile', [CustomerController::class, 'profile'])->name('profile');
 
-    // Keranjang & Pesanan (Dibutuhkan di Navbar Luxurious kamu)
+    // Cart
     Route::get('/cart', [CustomerController::class, 'cart'])->name('cart.index');
-    Route::get('/orders', [CustomerController::class, 'orders'])->name('orders.index');
     Route::post('/cart/add/{id}', [CustomerController::class, 'addToCart'])->name('cart.add');
 
+    // Orders
+    Route::get('/orders', [CustomerController::class, 'orders'])->name('orders.index');
+
     // Checkout
-    Route::controller(CheckoutController::class)->group(function() {
+    Route::controller(CheckoutController::class)->group(function () {
         Route::get('/checkout/{id}', 'create')->name('checkout');
-        Route::get('/checkout/create/{id}', 'create')->name('checkout.create'); // Legacy
+        Route::get('/checkout/create/{id}', 'create')->name('checkout.create');
         Route::post('/checkout/pay', 'pay')->name('checkout.pay');
     });
 });

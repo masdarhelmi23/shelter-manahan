@@ -10,18 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
-    public function pay($id)
+    public function pay(Request $request) 
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
+        // Sekarang kamu bisa ambil data dari form mewah tadi
+        $productId = $request->product_id;
+        $amount = $request->amount;
+        $phone = $request->phone;
+        $notes = $request->notes;
 
-        $order = Order::findOrFail($id);
-
-        $midtrans = new MidtransService();
-        $snap = $midtrans->createTransaction($order);
-
-        return redirect($snap->redirect_url);
+        // Contoh logika sederhana:
+        // Di sini kamu bisa masukkan ke tabel 'orders' atau lanjut ke Payment Gateway
+        
+        return "Terima kasih, pesanan produk ID $productId sedang diproses. Kami akan hubungi ke $phone";
     }
 
     public function create($id)

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login Customer | Shelter Manahan</title>
+    <title>Daftar Akun | Shelter Manahan</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -27,7 +27,6 @@
             position: relative; overflow: hidden; background: #000;
         }
 
-        /* BACKGROUND WITH OVERLAY */
         body::before {
             content: ""; position: absolute; inset: 0;
             background: url("{{ asset('images/bg-shelter.jpg') }}") center/cover no-repeat;
@@ -40,10 +39,10 @@
             z-index: -1;
         }
 
-        .login-box {
-            width: 100%; max-width: 420px;
+        .register-box {
+            width: 100%; max-width: 450px;
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 28px; padding: 45px 40px;
+            border-radius: 28px; padding: 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -56,11 +55,10 @@
         }
 
         h2 { text-align: center; color: var(--teks-gelap); font-weight: 800; font-size: 26px; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .subtitle { text-align: center; font-size: 14px; color: var(--teks-abu); margin-bottom: 35px; }
+        .subtitle { text-align: center; font-size: 14px; color: var(--teks-abu); margin-bottom: 30px; }
 
-        /* FORM STYLING */
         .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--teks-gelap); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--teks-gelap); margin-bottom: 8px; text-transform: uppercase; }
         
         input {
             width: 100%; padding: 14px 18px; border-radius: 14px;
@@ -69,93 +67,96 @@
         }
         input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); }
 
-        button#btnLogin {
+        button#btnRegister {
             width: 100%; padding: 16px; border: none; border-radius: 14px;
             background: var(--teks-gelap); color: white; font-weight: 700; font-size: 15px;
             cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px;
             margin-top: 10px;
         }
-        button#btnLogin:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-        button#btnLogin:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+        button#btnRegister:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        button#btnRegister:disabled { background: #9ca3af; cursor: not-allowed; }
 
         .divider { 
             text-align: center; margin: 25px 0; font-size: 12px; color: #9ca3af; 
             text-transform: uppercase; letter-spacing: 1.5px; position: relative;
         }
         .divider::before, .divider::after {
-            content: ""; position: absolute; top: 50%; width: 30%; height: 1px; background: #e5e7eb;
+            content: ""; position: absolute; top: 50%; width: 25%; height: 1px; background: #e5e7eb;
         }
         .divider::before { left: 0; } .divider::after { right: 0; }
 
-        /* GOOGLE BUTTON REVISI (OFFICIAL LOOK) */
         .google-btn {
             display: flex; align-items: center; justify-content: center; gap: 12px;
             padding: 14px; border-radius: 14px; border: 1.5px solid #e5e7eb;
             text-decoration: none; color: #374151; font-weight: 700; font-size: 14px;
             background: #fff; transition: var(--transition);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .google-btn:hover { 
-            background: #fff; border-color: #d1d5db; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px);
-        }
+        .google-btn:hover { border-color: #d1d5db; transform: translateY(-1px); }
         .google-btn img { width: 20px; height: 20px; }
 
         .footer { text-align: center; margin-top: 30px; font-size: 14px; color: var(--teks-abu); }
-        .footer a { color: var(--primary); font-weight: 700; text-decoration: none; transition: 0.2s; }
-        .footer a:hover { opacity: 0.8; text-decoration: underline; }
+        .footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
     </style>
 </head>
 
 <body>
 
-<div class="login-box">
-    <h2>Login Customer</h2>
-    <div class="subtitle">Silakan masuk ke akun Shelter Manahan Anda</div>
+<div class="register-box">
+    <h2>Daftar Akun Baru</h2>
+    <div class="subtitle">Gabung sekarang untuk mulai berbelanja di Shelter Manahan</div>
 
-    <form id="loginForm">
+    <form id="registerForm">
         @csrf
         <div class="form-group">
-            <label>Email atau Username</label>
-            <input type="text" name="login" id="login" placeholder="Masukkan email/username" required>
+            <label>Nama Lengkap</label>
+            <input type="text" name="name" placeholder="Contoh: Masdar Helmi" required>
+        </div>
+
+        <div class="form-group">
+            <label>Alamat Email</label>
+            <input type="email" name="email" placeholder="email@contoh.com" required>
         </div>
 
         <div class="form-group">
             <label>Password</label>
-            <input type="password" name="password" id="password" placeholder="••••••••" required>
+            <input type="password" name="password" placeholder="Minimal 8 karakter" required>
         </div>
 
-        <button type="submit" id="btnLogin">
-            <i class="fas fa-sign-in-alt"></i> <span>Masuk Sekarang</span>
+        <div class="form-group">
+            <label>Konfirmasi Password</label>
+            <input type="password" name="password_confirmation" placeholder="Ulangi password" required>
+        </div>
+
+        <button type="submit" id="btnRegister">
+            <i class="fas fa-user-plus"></i> <span>Daftar Sekarang</span>
         </button>
     </form>
 
-    <div class="divider">Atau</div>
+    <div class="divider">Atau daftar dengan</div>
 
     <a href="{{ url('/auth/google') }}" class="google-btn">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width:20px; height:20px;">
-        Masuk dengan Google
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
+        Google Account
     </a>
 
     <div class="footer">
-        Belum punya akun? 
-        <a href="{{ url('/register') }}">Daftar Sekarang</a>
+        Sudah punya akun? 
+        <a href="{{ route('customer.login') }}">Masuk Disini</a>
     </div>
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const btn = document.getElementById('btnLogin');
+        const btn = document.getElementById('btnRegister');
         const btnText = btn.querySelector('span');
         const formData = new FormData(this);
 
-        // Loading State
         btn.disabled = true;
-        btnText.innerText = 'Memverifikasi...';
+        btnText.innerText = 'Memproses...';
 
-        fetch("{{ url('/login') }}", {
+        fetch("{{ url('/register') }}", {
             method: "POST",
             headers: {
                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -168,29 +169,27 @@
             if (data.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Berhasil!',
-                    text: data.message,
+                    title: 'Pendaftaran Berhasil!',
+                    text: 'Akun Anda sudah siap. Mengalihkan...',
                     showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true,
-                    background: '#fff',
-                    color: '#111'
+                    timer: 2000,
+                    timerProgressBar: true
                 }).then(() => {
                     window.location.href = data.redirect;
                 });
             } else {
-                throw new Error(data.message);
+                throw new Error(data.message || 'Cek kembali data Anda.');
             }
         })
         .catch(error => {
             Swal.fire({
                 icon: 'error',
-                title: 'Login Gagal',
-                text: error.message || 'Kredensial tidak valid.',
+                title: 'Gagal Daftar',
+                text: error.message,
                 confirmButtonColor: '#111827'
             });
             btn.disabled = false;
-            btnText.innerText = 'Masuk Sekarang';
+            btnText.innerText = 'Daftar Sekarang';
         });
     });
 </script>

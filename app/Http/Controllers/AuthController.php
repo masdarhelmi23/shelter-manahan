@@ -15,72 +15,78 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    // Menampilkan halaman Register (Biar route di web.php tidak error)
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    // Proses Login Utama (Email/Username + AJAX Support)
     public function login(Request $request)
-{
-    // 1. Validasi Input
-    $request->validate([
-        'login' => 'required|string',
-        'password' => 'required',
-    ]);
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'login' => 'required|string',
+            'password' => 'required',
+        ]);
 
-    // 2. Cek apakah login menggunakan Email atau Username
-    $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+        // 2. Cek apakah login menggunakan Email atau Username
+        $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
 
-    $credentials = [
-        $loginType => $request->login,
-        'password' => $request->password,
-    ];
+        $credentials = [
+            $loginType => $request->login,
+            'password' => $request->password,
+        ];
 
-    // 3. Proses Attempt Login
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
+        // 3. Proses Attempt Login
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+            
+            // Logika Redirect Berdasarkan Role
+            if ($user->role === 'admin') {
+                $redirectUrl = route('admin.dashboard');
+            } elseif ($user->role === 'owner') {
+                $redirectUrl = route('owner.dashboard');
+            } else {
+                // Untuk Customer: Ambil halaman terakhir (intended), default ke welcome
+                $redirectUrl = session()->pull('url.intended', route('welcome'));
+            }
 
-        $user = Auth::user();
-        
-        // Tentukan Redirect URL berdasarkan Role
-        if ($user->role === 'admin') {
-            $redirectUrl = route('admin.dashboard');
-        } elseif ($user->role === 'owner') {
-            $redirectUrl = route('owner.dashboard');
-        } else {
-            // Untuk Customer: Ambil halaman terakhir yang ingin dibuka, 
-            // jika tidak ada, arahkan ke welcome/home.
-            $redirectUrl = session()->pull('url.intended', route('welcome'));
+            // RESPON UNTUK AJAX (SweetAlert)
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Selamat datang kembali, ' . $user->name,
+                    'redirect' => $redirectUrl
+                ]);
+            }
+
+            return redirect()->intended($redirectUrl);
         }
 
-        // RESPON UNTUK AJAX
+        // 4. JIKA GAGAL
         if ($request->ajax()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Selamat datang kembali, ' . $user->name,
-                'redirect' => $redirectUrl
-            ]);
+                'success' => false,
+                'message' => 'Kredensial yang diberikan tidak cocok dengan data kami.'
+            ], 401);
         }
 
-        // RESPON UNTUK REQUEST BIASA (Non-AJAX)
-        return redirect()->intended($redirectUrl);
+        return back()->withErrors([
+            'login' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
+        ])->onlyInput('login');
     }
 
-    // 4. JIKA GAGAL
-    if ($request->ajax()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Kredensial yang diberikan tidak cocok dengan data kami.'
-        ], 401);
-    }
-
-    return back()->withErrors([
-        'login' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
-    ])->onlyInput('login');
-}
-    // Proses logout
+    // Proses logout: REVISI REDIRECT KE WELCOME
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        // Diarahkan ke halaman menu awal (Welcome)
+        return redirect()->route('welcome');
     }
 
     // =========================
@@ -100,47 +106,70 @@ class AuthController extends Controller
     }
 
     // =========================
-    // GOOGLE CALLBACK
+    // GOOGLE CALLBACK (SINKRON ROLE)
     // =========================
     public function handleGoogleCallback()
-{
-    $googleUser = Socialite::driver('google')->stateless()->user();
+    {
+        $googleUser = Socialite::driver('google')->stateless()->user();
 
-    $user = User::updateOrCreate(
-        [
-            'email' => $googleUser->getEmail(),
-        ],
-        [
-            'name' => $googleUser->getName(),
-            'google_id' => $googleUser->getId(),
-            'password' => bcrypt('google_login'),
-            'role' => 'customer',
-        ]
-    );
+        $user = User::updateOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
+                'password' => bcrypt('google_login'),
+                'role' => 'customer', // Default Google login adalah customer
+            ]
+        );
 
-    Auth::login($user);
+        Auth::login($user);
 
-    // 🔥 FIX: langsung ke warung
-    return redirect('/warung/bakso');
-}
-
-// =========================
-// CUSTOMER LOGIN (FIX ERROR ROUTE)
-// =========================
-public function customerLogin(Request $request)
-{
-    $request->validate([
-        'email' => 'required',
-        'password' => 'required',
-    ]);
-
-    if (Auth::attempt($request->only('email', 'password'))) {
-        $request->session()->regenerate();
-        return redirect('/warung/bakso');
+        // Langsung arahkan ke intended URL (halaman terakhir dibuka) atau ke welcome
+        return redirect()->intended(route('welcome'));
     }
 
-    return back()->withErrors([
-        'email' => 'Login gagal',
-    ]);
-}
+    // =========================
+    // CUSTOMER LOGIN (FIX ROLE REDIRECT)
+    // =========================
+    public function customerLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $request->session()->regenerate();
+            
+            // Pastikan customer kembali ke halaman terakhir (misal halaman warung tadi)
+            return redirect()->intended(route('welcome'));
+        }
+
+        return back()->withErrors([
+            'email' => 'Login gagal, periksa kembali email dan password anda.',
+        ]);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'customer', // Default sebagai customer
+        ]);
+
+        Auth::login($user);
+
+        return response()->json([
+            'success' => true,
+            'redirect' => route('welcome')
+        ]);
+    }
 }
