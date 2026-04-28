@@ -7,99 +7,93 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
             --primary: #0284c7;
             --primary-soft: rgba(2, 132, 199, 0.08);
-            --bg-topbar: #f1f5f9;
+            --bg-navbar: #ffffff;
             --teks-gelap: #1e293b;
             --teks-abu: #64748b;
             --merah-logout: #ef4444;
-            --white: #ffffff;
-            --transition-smooth: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #000; min-height: 100vh; overflow-x: hidden; }
+        
+        body { background: #f1f5f9; min-height: 100vh; }
 
-        .page-container {
-            min-height: 100vh; display: flex; flex-direction: column;
-            background-image: linear-gradient(to bottom, rgba(0, 0, 0, .88), rgba(0, 0, 0, .70)),
-                url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover; background-position: center; background-attachment: fixed;
-        }
-
-        /* NAVBAR */
+        /* NAVBAR MEWAH */
         .navbar {
-            height: 85px; background: var(--bg-topbar);
+            height: 80px; background: var(--bg-navbar);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 5%; position: sticky; top: 0; z-index: 1001;
-            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            padding: 0 5%; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .05);
         }
 
-        .brand {
-            text-decoration: none; font-size: 20px; font-weight: 800;
-            color: var(--primary); letter-spacing: 1.5px; text-transform: uppercase;
-        }
+        .brand { text-decoration: none; font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: 1.2px; text-transform: uppercase; }
         .brand span { color: var(--teks-gelap); font-weight: 400; }
-
-        .nav-links { display: flex; align-items: center; gap: 15px; }
-        .nav-item {
-            text-decoration: none; color: var(--teks-abu); font-size: 12px;
-            font-weight: 700; padding: 10px 15px; border-radius: 12px;
-            text-transform: uppercase; transition: 0.3s;
-            display: flex; align-items: center; gap: 8px;
+        
+        .nav-links { display: flex; align-items: center; gap: 10px; }
+        .nav-item { 
+            text-decoration: none; color: var(--teks-abu); font-size: 11px; font-weight: 700; 
+            padding: 10px 15px; border-radius: 10px; text-transform: uppercase; 
+            display: flex; align-items: center; gap: 6px; transition: 0.3s;
         }
         .nav-item:hover, .nav-item.active { color: var(--primary); background: var(--primary-soft); }
 
-        .user-menu { display: flex; align-items: center; gap: 15px; border-left: 2px solid #e2e8f0; padding-left: 20px; }
-        .btn-logout {
-            background: var(--merah-logout); color: #fff; border: none;
-            padding: 10px 18px; border-radius: 10px; font-size: 11px;
-            font-weight: 800; cursor: pointer; text-transform: uppercase;
+        /* Keranjang & Badge */
+        .cart-link { position: relative; display: flex; align-items: center; }
+        .cart-badge { 
+            background: #f43f5e; color: #fff; font-size: 9px; 
+            padding: 2px 6px; border-radius: 50px; font-weight: 800;
+            position: absolute; top: -5px; right: -5px;
+            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
         }
 
-        /* Tombol Kembali Global */
-        .btn-back-global {
-            position: fixed; top: 105px; left: 25px; z-index: 999;
-            padding: 12px 20px; border-radius: 50px; background: rgba(255, 255, 255, 0.95);
-            color: var(--teks-gelap); font-size: 11px; font-weight: 800;
-            border: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
-            transition: var(--transition-smooth); box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            display: flex; align-items: center; gap: 8px; text-decoration: none;
-        }
-        .btn-back-global:hover { background: var(--primary); color: #fff; transform: translateY(-5px); }
+        .user-menu { display: flex; align-items: center; gap: 12px; border-left: 2px solid #e2e8f0; padding-left: 15px; margin-left: 10px; }
+        .btn-logout { background: var(--merah-logout); color: #fff; border: none; padding: 8px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-logout:hover { filter: brightness(0.9); transform: translateY(-1px); }
 
-        @yield('extra-css')
+        /* Scrollbar Mewah */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
     </style>
+    @yield('extra-css')
 </head>
 <body>
-    <div class="page-container">
-        <nav class="navbar">
-            <a href="/" class="brand">SHELTER <span>MANAHAN</span></a>
-            <div class="nav-links">
-                @if(auth()->check())
-                    <a href="/" class="nav-item {{ request()->is('/') ? 'active' : '' }}"><i class="fa-solid fa-utensils"></i> <span>Katalog</span></a>
-                    <a href="{{ route('cart.index') }}" class="nav-item {{ request()->routeIs('cart.index') ? 'active' : '' }}"><i class="fa-solid fa-shopping-cart"></i> <span>Keranjang</span></a>
-                    <div class="user-menu">
-                        <span style="font-weight: 700; font-size: 13px; color: var(--teks-gelap);">{{ auth()->user()->name }}</span>
-                        <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="btn-logout">KELUAR</button>
-                        </form>
-                    </div>
-                @else
-                    <a href="{{ route('customer.login') }}" class="nav-item">MASUK</a>
-                @endif
-            </div>
-        </nav>
+    <nav class="navbar">
+        <a href="/" class="brand">SHELTER <span>MANAHAN</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-item {{ request()->is('/') ? 'active' : '' }}"><i class="fa-solid fa-utensils"></i> Katalog</a>
+            
+            @if(auth()->check())
+                <a href="{{ route('orders.index') }}" class="nav-item {{ request()->routeIs('orders.index') ? 'active' : '' }}"><i class="fa-solid fa-receipt"></i> Pesanan</a>
+                
+                <a href="{{ route('cart.index') }}" class="nav-item cart-link {{ request()->routeIs('cart.index') ? 'active' : '' }}">
+                    <i class="fa-solid fa-shopping-cart" style="font-size: 16px;"></i>
+                    <span class="cart-badge" id="cartCount">
+                        {{-- Logika dinamis hitung total porsi di keranjang --}}
+                        {{ \App\Models\Cart::where('user_id', auth()->id())->sum('quantity') }}
+                    </span>
+                </a>
 
-        @yield('content')
+                <div class="user-menu">
+                    <span style="font-weight: 700; font-size: 13px; color: var(--teks-gelap);">{{ auth()->user()->name }}</span>
+                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-logout">KELUAR</button>
+                    </form>
+                </div>
+            @else
+                <a href="{{ route('customer.login') }}" class="nav-item">Masuk</a>
+            @endif
+        </div>
+    </nav>
 
-        <footer style="text-align:center; padding:60px; color:#64748b; font-size:11px; border-top: 1px solid rgba(255,255,255,0.1);">
-            &copy; {{ date('Y') }} <b>Shelter Manahan</b> &bull; Executive System
-        </footer>
-    </div>
+    @yield('content')
+
 </body>
 </html>

@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shelter Manahan | Pusat Kuliner Solo</title>
+@extends('layouts.customer')
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+@section('title', 'Shelter Manahan | Pusat Kuliner Solo')
 
+@section('extra-css')
 <style>
 :root{
     --primary:#00a6ff;
@@ -27,6 +22,7 @@
 body{
     background:#f1f5f9;
     color:#111827;
+    overflow-x:hidden;
 }
 
 /* HERO */
@@ -210,30 +206,151 @@ footer{
     margin-top:50px;
 }
 
-/* MOBILE */
+/* ================= MOBILE RESPONSIVE ================= */
 @media(max-width:768px){
 
+body{
+    overflow-x:hidden;
+}
+
 .hero{
-    min-height:62vh;
+    min-height:58vh;
+    padding:20px 15px;
+}
+
+.hero-content{
+    width:100%;
+}
+
+.badge-top{
+    font-size:10px;
+    padding:8px 14px;
+    letter-spacing:1px;
+    margin-bottom:15px;
+}
+
+.hero h1{
+    font-size:34px;
+    line-height:1.2;
+    margin-bottom:12px;
+}
+
+.hero p{
+    font-size:14px;
+    line-height:1.7;
 }
 
 .hero-box{
-    margin-top:-35px;
-    padding:14px;
+    margin:-28px 14px 0;
+    padding:12px;
+    border-radius:18px;
+}
+
+.map-box{
+    border-radius:14px;
 }
 
 .map-box iframe{
     height:220px;
 }
 
+.container{
+    padding:35px 14px;
+}
+
 .section-title{
+    font-size:26px;
+    line-height:1.3;
+}
+
+.section-sub{
+    font-size:14px;
+    margin-bottom:28px;
+    padding:0 5px;
+}
+
+.grid-warung{
+    grid-template-columns:1fr;
+    gap:16px;
+}
+
+.card-warung{
+    padding:20px;
+    border-radius:18px;
+}
+
+.icon-box{
+    width:78px;
+    height:78px;
+    border-radius:18px;
+    margin-bottom:14px;
+}
+
+.shop-name{
+    font-size:18px;
+    margin-bottom:14px;
+}
+
+.produk-preview{
+    gap:7px;
+    margin-bottom:18px;
+}
+
+.pill{
+    font-size:11px;
+    padding:6px 10px;
+}
+
+.btn-lihat{
+    padding:12px;
+    font-size:13px;
+    border-radius:12px;
+}
+
+footer{
+    font-size:13px;
+    padding:30px 15px;
+    line-height:1.8;
+}
+
+}
+
+/* EXTRA SMALL DEVICE */
+@media(max-width:420px){
+
+.hero h1{
     font-size:28px;
+}
+
+.hero p{
+    font-size:13px;
+}
+
+.map-box iframe{
+    height:200px;
+}
+
+.section-title{
+    font-size:22px;
+}
+
+.card-warung{
+    padding:16px;
+}
+
+.shop-name{
+    font-size:17px;
+}
+
+.btn-lihat{
+    font-size:12px;
 }
 
 }
 </style>
-</head>
-<body>
+@endsection
+
+@section('content')
 
 <!-- HERO -->
 <section class="hero">
@@ -321,11 +438,9 @@ LIHAT SEMUA MENU
 
 <footer>
 © {{ date('Y') }} Shelter Manahan. All rights reserved. <br><br>
-
 <a href="{{ route('login') }}" style="color:#38bdf8;text-decoration:none;font-weight:700;">
 Managed by Surakarta Digital Team
 </a>
 </footer>
 
-</body>
-</html>
+@endsection

@@ -21,7 +21,6 @@ Route::get('/warung/{slug}', [CustomerController::class, 'showWarung'])->name('c
 |--------------------------------------------------------------------------
 */
 Route::controller(AuthController::class)->group(function () {
-
     // Login & Register
     Route::get('/login', 'showLogin')->name('login');
     Route::post('/login', 'login');
@@ -29,7 +28,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/register', 'showRegister')->name('register');
     Route::post('/register', 'register');
 
-    // Logout diarahkan ke method yang meredirect ke Welcome
     Route::post('/logout', 'logout')->name('logout');
 
     // Customer Login Khusus
@@ -50,7 +48,6 @@ Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // Users
@@ -74,11 +71,9 @@ Route::middleware(['auth', 'role:owner'])
     ->prefix('owner')
     ->name('owner.')
     ->group(function () {
-
         Route::get('/dashboard', [OwnerController::class, 'dashboard'])->name('dashboard');
 
         Route::controller(OwnerController::class)->group(function () {
-
             // Produk
             Route::get('/produk', 'produk')->name('produk');
             Route::get('/produk/create', 'create')->name('produk.create');
@@ -106,17 +101,25 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/home', [CustomerController::class, 'index'])->name('customer.home');
     Route::get('/profile', [CustomerController::class, 'profile'])->name('profile');
 
-    // Cart
+    // --- Bagian Cart ---
     Route::get('/cart', [CustomerController::class, 'cart'])->name('cart.index');
     Route::post('/cart/add/{id}', [CustomerController::class, 'addToCart'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [CustomerController::class, 'removeFromCart'])->name('cart.remove');
 
-    // Orders
+    // --- Bagian Orders ---
     Route::get('/orders', [CustomerController::class, 'orders'])->name('orders.index');
 
-    // Checkout
+    // --- Bagian Checkout (FIX 404 DI SINI) ---
     Route::controller(CheckoutController::class)->group(function () {
+        // 1. Rute Statis Wajib di Paling Atas (all & finish)
+        Route::get('/checkout/all', 'index')->name('checkout.all');
+        Route::get('/checkout/finish', 'finish')->name('checkout.finish');
+        
+        // 2. Baru Rute Dinamis yang pakai {id} di bawahnya
         Route::get('/checkout/{id}', 'create')->name('checkout');
         Route::get('/checkout/create/{id}', 'create')->name('checkout.create');
+        
+        // 3. Proses Pembayaran
         Route::post('/checkout/pay', 'pay')->name('checkout.pay');
     });
 });
