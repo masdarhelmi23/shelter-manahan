@@ -211,11 +211,9 @@ small{
    RESPONSIVE TABLET
 ========================= */
 @media (max-width:992px){
-
     .judul-halaman{
         font-size:28px;
     }
-
     .kartu-form{
         padding:30px;
     }
@@ -225,44 +223,36 @@ small{
    RESPONSIVE MOBILE
 ========================= */
 @media (max-width:768px){
-
     .form-wrapper-center{
         min-height:auto;
         padding:10px 0 25px;
     }
-
     .judul-halaman{
         font-size:24px;
         margin-bottom:20px;
     }
-
     .kartu-form{
         padding:22px;
         border-radius:24px;
     }
-
     .grid-2{
         grid-template-columns:1fr;
         gap:15px;
     }
-
     .logo-box{
         flex-direction:column;
         align-items:stretch;
         gap:18px;
         padding:18px;
     }
-
     .logo-preview-wrap{
         text-align:center;
     }
-
     .logo-preview{
         margin:0 auto;
         width:90px;
         height:90px;
     }
-
     .btn-simpan{
         padding:15px;
         font-size:14px;
@@ -273,31 +263,25 @@ small{
    EXTRA SMALL
 ========================= */
 @media (max-width:480px){
-
     .judul-halaman{
         font-size:21px;
     }
-
     .kartu-form{
         padding:18px;
         border-radius:20px;
     }
-
     .section-title{
         font-size:16px;
     }
-
     .form-group label{
         font-size:10px;
         letter-spacing:.8px;
     }
-
     .form-control{
         padding:13px;
         font-size:13px;
         border-radius:10px;
     }
-
     .btn-simpan{
         border-radius:12px;
     }
@@ -329,10 +313,8 @@ small{
             </div>
 
             <div class="logo-box">
-
                 <div class="logo-preview-wrap">
                     <label>Logo Saat Ini</label>
-
                     <div class="logo-preview">
                         @if($shop->logo)
                             <img src="{{ asset('storage/' . $shop->logo) }}">
@@ -347,7 +329,6 @@ small{
                     <input type="file" name="logo" class="form-control text-white" accept="image/*">
                     <small style="color:#cbd5e1;">*Format: JPG, PNG (Maks. 2MB)</small>
                 </div>
-
             </div>
 
             <div class="form-group">
@@ -356,7 +337,6 @@ small{
             </div>
 
             <div class="grid-2 mt-15">
-
                 <div class="form-group">
                     <label>Nomor WhatsApp (Contoh: 628123xxx)</label>
                     <input type="text" name="whatsapp" class="form-control" value="{{ $shop->whatsapp }}" placeholder="628...">
@@ -366,7 +346,22 @@ small{
                     <label>Username Instagram (Tanpa @)</label>
                     <input type="text" name="instagram" class="form-control" value="{{ $shop->instagram }}" placeholder="nama_toko_ig">
                 </div>
+            </div>
 
+            <!-- PENAMBAHAN JAM OPERASIONAL (REVISED VALUE FORMAT) -->
+            <div class="grid-2 mt-15">
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Jam Buka</label>
+                    {{-- Kita format nilainya ke H:i agar dikenali input type="time" --}}
+                    <input type="time" name="jam_buka" class="form-control" 
+                        value="{{ $shop->open_time ? \Carbon\Carbon::parse($shop->open_time)->format('H:i') : '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-moon"></i> Jam Tutup</label>
+                    <input type="time" name="jam_tutup" class="form-control" 
+                        value="{{ $shop->close_time ? \Carbon\Carbon::parse($shop->close_time)->format('H:i') : '' }}">
+                </div>
             </div>
 
             <!-- ===================== -->
@@ -377,7 +372,6 @@ small{
             </div>
 
             <div class="grid-2">
-
                 <div class="form-group">
                     <label>Username Login</label>
                     <input type="text" name="username" class="form-control" value="{{ $user->name }}" required>
@@ -387,11 +381,9 @@ small{
                     <label>Alamat Email</label>
                     <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
                 </div>
-
             </div>
 
             <div class="grid-2 mt-15">
-
                 <div class="form-group">
                     <label>Password Baru (Kosongkan jika tidak ganti)</label>
                     <input type="password" name="password" class="form-control">
@@ -401,7 +393,6 @@ small{
                     <label>Konfirmasi Password Baru</label>
                     <input type="password" name="password_confirmation" class="form-control">
                 </div>
-
             </div>
 
             <button type="submit" class="btn-simpan">
@@ -409,8 +400,6 @@ small{
             </button>
 
         </form>
-
     </div>
-
 </div>
 @endsection

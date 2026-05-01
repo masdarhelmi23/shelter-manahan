@@ -10,10 +10,13 @@ class Shop extends Model
     'user_id', 
     'name', 
     'slug', 
-    'logo', // <--- WAJIB ADA INI MAS!
+    'logo', 
     'status', 
     'whatsapp', 
-    'instagram'
+    'instagram',
+    'open_time',
+    'close_time',
+    'is_active',
 ];
 
     // Relasi ke User (Pemilik Toko)

@@ -123,3 +123,15 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
         Route::post('/checkout/pay', 'pay')->name('checkout.pay');
     });
 });
+
+Route::get('/owner/pesanan', [OwnerController::class, 'pesanan'])->name('owner.pesanan');
+Route::put('/owner/pesanan/{id}/status', [OwnerController::class, 'updateStatusPesanan'])->name('owner.pesanan.status');
+
+// Rincian Route Pesanan Owner
+Route::prefix('owner')->name('owner.')->middleware(['auth', 'role:owner'])->group(function () {
+    Route::get('/pesanan', [OwnerController::class, 'pesanan'])->name('pesanan');
+    Route::post('/pesanan/store', [OwnerController::class, 'storePesanan'])->name('pesanan.store');
+    Route::put('/pesanan/{id}/status', [OwnerController::class, 'updateStatusPesanan'])->name('pesanan.status');
+    Route::put('/pesanan/{id}/update', [OwnerController::class, 'updatePesanan'])->name('pesanan.update');
+    Route::delete('/pesanan/{id}/destroy', [OwnerController::class, 'destroyPesanan'])->name('pesanan.destroy');
+});

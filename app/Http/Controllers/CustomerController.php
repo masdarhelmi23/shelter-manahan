@@ -126,11 +126,13 @@ class CustomerController extends Controller
     }
     public function orders()
     {
-        // Ambil data pesanan milik user yang sedang login, urutkan dari yang terbaru
-        $orders = Order::where('user_id', Auth::id())
-                        ->orderBy('created_at', 'desc')
-                        ->get();
+        // Ambil data, urutkan yang terbaru, lalu kelompokkan berdasarkan order_id
+        $groupedOrders = Order::where('user_id', Auth::id())
+                        ->with('product')
+                        ->latest()
+                        ->get()
+                        ->groupBy('order_id');
 
-        return view('customer.orders', compact('orders'));
+        return view('customer.orders', compact('groupedOrders'));
     }
 }

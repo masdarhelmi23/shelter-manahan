@@ -33,30 +33,29 @@
             width: 100%;
             overflow-x: hidden;
             scroll-behavior: smooth;
-        }
-
-        body {
             background: #000;
-            min-height: 100vh;
         }
 
         /* =========================================
-           PAGE CONTAINER & BACKGROUND
+            PAGE CONTAINER & LOCKED BACKGROUND
         ========================================= */
         .page-container {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            /* TAMBAHKAN PADDING TOP SEBESAR TINGGI NAVBAR (85px) */
+            padding-top: 85px; 
             background-image: 
-                linear-gradient(to bottom, rgba(0, 0, 0, .82), rgba(0, 0, 0, .60)),
+                linear-gradient(to bottom, rgba(0, 0, 0, .85), rgba(0, 0, 0, .65)),
                 url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
+            background-attachment: fixed; 
+            background-repeat: no-no-repeat;
         }
 
         /* =========================================
-           NAVBAR STYLE
+            NAVBAR STYLE (DIATUR FIXED AGAR TIDAK KEGESER)
         ========================================= */
         .navbar {
             height: 85px;
@@ -65,8 +64,11 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
-            position: sticky;
+            /* UBAH KE FIXED AGAR TERKUNCI DI ATAS LAYAR */
+            position: fixed; 
             top: 0;
+            left: 0;
+            width: 100%;
             z-index: 1000;
             box-shadow: var(--shadow-soft);
         }
@@ -89,7 +91,7 @@
         }
 
         /* =========================================
-           NAVIGATION LINKS
+            NAVIGATION LINKS
         ========================================= */
         .nav-links {
             display: flex;
@@ -123,7 +125,6 @@
             background: var(--primary-soft);
         }
 
-        /* BADGE KERANJANG */
         .cart-badge {
             background: var(--merah-logout);
             color: #fff;
@@ -136,7 +137,7 @@
         }
 
         /* =========================================
-           USER MENU & PROFILE
+            USER MENU & PROFILE
         ========================================= */
         .user-menu {
             display: flex;
@@ -151,8 +152,6 @@
             text-align: right;
         }
 
-        
-
         .user-name {
             font-size: 14px;
             font-weight: 700;
@@ -163,7 +162,6 @@
             white-space: nowrap;
         }
 
-        /* LOGOUT BUTTON */
         .btn-logout {
             background: var(--merah-logout);
             color: #fff;
@@ -187,25 +185,29 @@
         }
 
         /* =========================================
-           MAIN CONTENT AREA
+            MAIN CONTENT AREA (FLOATING CARD EFFECT)
         ========================================= */
         .main-content {
             flex: 1;
-            padding: 60px 5%;
+            padding: 40px 5%;
             width: 100%;
             max-width: 1600px;
-            margin: 0 auto;
+            margin: 20px auto 40px; 
             animation: fadeIn 0.8s ease;
+            
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: calc(100vh - 165px);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* =========================================
-           MOBILE TOGGLE (HAMBURGER)
-        ========================================= */
         .menu-toggle {
             display: none;
             font-size: 24px;
@@ -224,7 +226,7 @@
         }
 
         /* =========================================
-           RESPONSIVE DESIGN (TABLET & MOBILE)
+            RESPONSIVE DESIGN
         ========================================= */
         @media (max-width: 1150px) {
             .navbar { padding: 0 3%; }
@@ -278,35 +280,30 @@
             }
 
             .btn-logout { width: auto; padding: 14px 25px; }
+            .main-content { margin: 15px; border-radius: 25px; }
         }
 
         @media (max-width: 768px) {
             .navbar { height: 75px; }
             .nav-links { top: 75px; }
+            /* KOMPENSASI PADDING UNTUK MOBILE NAVBAR */
+            .page-container { padding-top: 75px; } 
             .brand { font-size: 19px; }
             .user-info { text-align: left; }
             .user-menu { flex-direction: column; align-items: flex-start; gap: 15px; }
             .btn-logout { width: 100%; justify-content: center; }
-            .main-content { padding: 40px 20px; }
+            .main-content { padding: 30px 15px; }
         }
     </style>
 </head>
-
 <body>
-
     <div class="page-container">
-
         <nav class="navbar">
-
             <a href="/" class="brand">
                 SHELTER <span>MANAHAN</span>
             </a>
-
             <div class="nav-links" id="mobileMenu">
-
                 @if(auth()->check())
-                    
-                    {{-- AREA ADMIN --}}
                     @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-chart-pie"></i> RINGKASAN
@@ -317,8 +314,6 @@
                         <a href="{{ route('admin.shops') }}" class="nav-item {{ request()->routeIs('admin.shops') ? 'active' : '' }}">
                             <i class="fa-solid fa-shop"></i> KONTROL TOKO
                         </a>
-
-                    {{-- AREA OWNER (PEDAGANG) --}}
                     @elseif(auth()->user()->role === 'owner')
                         <a href="{{ route('owner.dashboard') }}" class="nav-item {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-gauge-high"></i> DASHBOARD
@@ -326,35 +321,28 @@
                         <a href="{{ route('owner.produk') }}" class="nav-item {{ request()->routeIs('owner.produk') ? 'active' : '' }}">
                             <i class="fa-solid fa-bowl-food"></i> PRODUK SAYA
                         </a>
-                        <a href="#" class="nav-item">
+                        <a href="{{ route('owner.pesanan') }}" class="nav-item {{ request()->routeIs('owner.pesanan') ? 'active' : '' }}">
                             <i class="fa-solid fa-clipboard-list"></i> PESANAN
                         </a>
                         <a href="{{ route('owner.pengaturan') }}" class="nav-item {{ request()->routeIs('owner.pengaturan') ? 'active' : '' }}">
                             <i class="fa-solid fa-gears"></i> PENGATURAN
                         </a>
-
-                    {{-- AREA CUSTOMER (PEMBELI) --}}
                     @elseif(auth()->user()->role === 'customer')
                         <a href="{{ url('/') }}" class="nav-item {{ request()->is('/') ? 'active' : '' }}">
                             <i class="fa-solid fa-utensils"></i> KATALOG
                         </a>
-                        
                         <a href="{{ route('cart.index') }}" class="nav-item {{ request()->routeIs('cart.index') ? 'active' : '' }}">
                             <i class="fa-solid fa-shopping-cart"></i> KERANJANG 
                             <span class="cart-badge" id="cartCount">0</span>
                         </a>
-                        
                         <a href="{{ route('orders.index') }}" class="nav-item {{ request()->routeIs('orders.index') ? 'active' : '' }}">
                             <i class="fa-solid fa-receipt"></i> PESANAN SAYA
                         </a>
                     @endif
-
                     <div class="user-menu">
                         <div class="user-info">
-                            
                             <span class="user-name">{{ auth()->user()->name }}</span>
                         </div>
-
                         <form action="{{ route('logout') }}" method="POST" style="margin:0; display: flex;">
                             @csrf
                             <button type="submit" class="btn-logout">
@@ -362,9 +350,7 @@
                             </button>
                         </form>
                     </div>
-
                 @else
-                    {{-- MENU JIKA TAMU (BELUM LOGIN) --}}
                     <a href="{{ route('login') }}" class="nav-item">
                         <i class="fa-solid fa-right-to-bracket"></i> MASUK
                     </a>
@@ -372,19 +358,15 @@
                         <i class="fa-solid fa-user-plus"></i> DAFTAR
                     </a>
                 @endif
-
             </div>
-
             <div class="menu-toggle" id="menuToggle">
                 <i class="fa-solid fa-bars"></i>
             </div>
-
         </nav>
 
         <main class="main-content">
             @yield('content')
         </main>
-
     </div>
 
     <script>
@@ -393,11 +375,8 @@
             const mobileMenu = document.getElementById('mobileMenu');
             const toggleIcon = toggleBtn.querySelector('i');
 
-            // Fungsi Toggle Menu Mobile
             toggleBtn.addEventListener('click', function () {
                 mobileMenu.classList.toggle('show');
-                
-                // Animasi Ganti Ikon
                 if (mobileMenu.classList.contains('show')) {
                     toggleIcon.classList.replace('fa-bars', 'fa-xmark');
                 } else {
@@ -405,7 +384,6 @@
                 }
             });
 
-            // Tutup menu otomatis jika user klik link (khusus mobile)
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', () => {
                     if (window.innerWidth <= 1024) {
@@ -415,7 +393,6 @@
                 });
             });
 
-            // Mencegah menu terbuka tertinggal saat resize window ke desktop
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 1024) {
                     mobileMenu.classList.remove('show');
@@ -424,6 +401,5 @@
             });
         });
     </script>
-
 </body>
 </html>

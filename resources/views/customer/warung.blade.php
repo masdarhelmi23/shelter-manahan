@@ -5,7 +5,7 @@
 @section('extra-css')
 <style>
     /* =========================================
-       MODERN EXECUTIVE DARK (STAY AUTHENTIC)
+        MODERN EXECUTIVE DARK (STAY AUTHENTIC)
     ========================================= */
     body {
         background: 
@@ -20,7 +20,19 @@
     .shop-header { position: relative; padding: 60px 20px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; }
     .shop-logo { width: 140px; height: 140px; border-radius: 35px; margin: 0 auto 25px; overflow: hidden; background: #fff; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
     .shop-logo img { width: 100%; height: 100%; object-fit: cover; }
-    .shop-name { font-size: 42px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 25px; }
+    .shop-name { font-size: 42px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 10px; }
+    
+    /* JAM OPERASIONAL & STATUS */
+    .shop-hours { 
+        display: flex; align-items: center; gap: 12px; margin-bottom: 25px; 
+        color: #cbd5e1; font-size: 14px; font-weight: 600;
+        background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 50px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
+    .badge-open { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .badge-closed { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
     .social-actions { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
     .btn-social { padding: 12px 25px; border-radius: 12px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1); color: #fff; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); transition: 0.3s; text-transform: uppercase; text-decoration: none; }
     .btn-social:hover { background: var(--primary); transform: translateY(-3px); }
@@ -73,6 +85,13 @@
     .btn-cart:hover:not(:disabled) { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(2, 132, 199, 0.4); }
     .btn-cart:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
 
+    /* CLOSED STATE OVERLAY */
+    .closed-banner {
+        background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 15px; border-radius: 20px; color: #f87171; font-weight: 800;
+        text-align: center; margin-bottom: 30px; backdrop-filter: blur(10px);
+    }
+
     @media (max-width: 1150px) { .main-grid { grid-template-columns: 1fr; } .sidebar-rincian { position: static; margin-bottom: 40px; order: -1; } }
 </style>
 @endsection
@@ -89,6 +108,29 @@
             @endif
         </div>
         <h1 class="shop-name">{{ $shop->name }}</h1>
+
+        <!-- LOGIKA BUKA TUTUP (OPERASIONAL + MANUAL) -->
+        @php
+            $now = now();
+            $open = \Carbon\Carbon::createFromTimeString($shop->open_time ?? '00:00');
+            $close = \Carbon\Carbon::createFromTimeString($shop->close_time ?? '23:59');
+            $isAutoOpen = $now->between($open, $close);
+            
+            // Warung buka HANYA JIKA (is_active true) DAN (saat ini masuk jam operasional)
+            $isOpen = $shop->is_active && $isAutoOpen;
+        @endphp
+
+        @if($shop->open_time && $shop->close_time)
+            <div class="shop-hours">
+                <i class="fa-solid fa-clock"></i>
+                <span>{{ \Carbon\Carbon::parse($shop->open_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($shop->close_time)->format('H:i') }}</span>
+
+                <span class="status-badge {{ $isOpen ? 'badge-open' : 'badge-closed' }}">
+                    {{ $isOpen ? 'BUKA' : 'TUTUP' }}
+                </span>
+            </div>
+        @endif
+
         <div class="social-actions">
             @if($shop->whatsapp) 
                 <a href="https://wa.me/{{ $shop->whatsapp }}" class="btn-social" target="_blank"><i class="fa-brands fa-whatsapp fa-lg"></i> WHATSAPP</a> 
@@ -100,9 +142,17 @@
     </header>
 
     <div class="container">
+        <!-- BANNER PERINGATAN JIKA TUTUP -->
+        @if(!$isOpen)
+            <div class="closed-banner animate__animated animate__headShake">
+                <i class="fa-solid fa-circle-exclamation"></i> MAAF, SAAT INI WARUNG SEDANG TUTUP. ANDA TIDAK DAPAT MELAKUKAN PEMESANAN.
+            </div>
+        @endif
+
         <div class="main-grid">
             <div class="menu-side">
-                <div class="grid-menu">
+                <!-- DIM MENU JIKA TUTUP -->
+                <div class="grid-menu" style="{{ !$isOpen ? 'opacity: 0.5; pointer-events: none;' : '' }}">
                     @forelse($products as $product)
                         <div class="card-menu">
                             <div class="img-wrapper">
@@ -130,7 +180,7 @@
             </div>
 
             <aside class="sidebar-side">
-                <div class="sidebar-rincian">
+                <div class="sidebar-rincian" style="{{ !$isOpen ? 'opacity: 0.7; pointer-events: none;' : '' }}">
                     <div class="sidebar-title">
                         <i class="fa-solid fa-receipt"></i> RINCIAN PESANAN
                     </div>
@@ -148,7 +198,7 @@
                     </div>
 
                     <button type="button" id="btn-gas-cart" class="btn-cart" disabled onclick="gasAddToCart()">
-                        <i class="fa-solid fa-cart-plus"></i> MASUKKAN KERANJANG
+                        <i class="fa-solid fa-cart-plus"></i> {{ $isOpen ? 'MASUKKAN KERANJANG' : 'WARUNG TUTUP' }}
                     </button>
                 </div>
             </aside>
@@ -159,6 +209,9 @@
         let keranjangSementara = {};
 
         function updateStruk(id, name, price, delta) {
+            // Tambahan proteksi JS jika tombol tetap diklik saat tutup
+            if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") return;
+
             if (!keranjangSementara[id]) {
                 keranjangSementara[id] = { name: name, price: price, qty: 0 };
             }
@@ -166,9 +219,7 @@
             keranjangSementara[id].qty += delta;
             if (keranjangSementara[id].qty < 0) keranjangSementara[id].qty = 0;
 
-            // Update UI Input di kartu
             document.getElementById('qty-input-' + id).value = keranjangSementara[id].qty;
-
             renderStruk();
         }
 
@@ -204,13 +255,19 @@
                 btnCart.disabled = true;
             } else {
                 container.innerHTML = html;
-                btnCart.disabled = false;
+                // Pastikan tombol keranjang tetap mati jika warung tutup meskipun ada item terpilih (jika ada bug CSS)
+                btnCart.disabled = ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") ? true : false;
             }
 
             totalTxt.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
         }
 
         async function gasAddToCart() {
+            if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") {
+                Swal.fire('Maaf', 'Warung sudah tutup.', 'error');
+                return;
+            }
+
             Swal.fire({ title: 'Memproses...', didOpen: () => { Swal.showLoading(); } });
 
             try {

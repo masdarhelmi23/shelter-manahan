@@ -30,33 +30,33 @@ class CheckoutController extends Controller
      */
     public function pay(Request $request) 
     {
-        // 1. Ambil data keranjang user
         $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-        
-        if ($cartItems->isEmpty()) {
-            return response()->json(['error' => 'Keranjang kosong'], 400);
-        }
+        if ($cartItems->isEmpty()) return response()->json(['error' => 'Kosong'], 400);
 
-        // 2. Hitung total harga
-        $total = $cartItems->sum(function($item) {
-            return $item->product->harga * $item->quantity;
-        });
+        $total = $cartItems->sum(fn($item) => $item->product->harga * $item->quantity);
+        
+        // Buat satu ID Invoice yang sama untuk semua barang ini
+        $invoiceId = 'INV-' . time() . '-' . Auth::id();
 
         try {
-            // 3. Buat data di tabel orders
-            // Menyesuaikan dengan kolom DB kamu: user_id, product_id, order_id, amount, status
-            $order = Order::create([
-                'user_id'    => Auth::id(),
-                'product_id' => null, // Null karena checkout banyak produk (Cart)
-                'order_id'   => 'INV-' . time() . '-' . Auth::id(), // Generate ID invoice unik
-                'amount'     => (int)$total,
-                'status'     => 'pending',
-            ]);
+            // SIMPAN TIAP BARANG SEBAGAI SATU BARIS
+            foreach ($cartItems as $cart) {
+                Order::create([
+                    'user_id'    => Auth::id(),
+                    'product_id' => $cart->product_id,
+                    'order_id'   => $invoiceId, // ID-nya sama semua
+                    'amount'     => $cart->product->harga * $cart->quantity, // Harga per barang x qty
+                    'status'     => 'pending',
+                ]);
+            }
 
-            // 4. Siapkan parameter untuk Midtrans Snap
+            // Konfigurasi Midtrans (Gross Amount tetap TOTAL semua barang)
+            \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+            \Midtrans\Config::$isProduction = false;
+            
             $params = [
                 'transaction_details' => [
-                    'order_id'     => $order->order_id, // Menggunakan string order_id yang baru dibuat
+                    'order_id'     => $invoiceId,
                     'gross_amount' => (int)$total,
                 ],
                 'customer_details' => [
@@ -65,15 +65,12 @@ class CheckoutController extends Controller
                 ],
             ];
 
-            // 5. Dapatkan Snap Token dari Midtrans
-            $snapToken = Snap::getSnapToken($params);
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            
+            // Update snap_token di semua baris yang invoice-nya sama
+            Order::where('order_id', $invoiceId)->update(['snap_token' => $snapToken]);
 
-            // 6. Simpan snap_token ke database agar bisa digunakan nanti jika perlu
-            $order->update(['snap_token' => $snapToken]);
-
-            // 7. Kembalikan respon JSON ke JavaScript di Frontend
             return response()->json(['snap_token' => $snapToken]);
-
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
