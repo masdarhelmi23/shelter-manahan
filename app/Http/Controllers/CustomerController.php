@@ -6,8 +6,10 @@ use App\Models\Shop;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
+use App\Models\OrderDetail; // Tambahkan Model ini
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; // Tambahkan facade DB untuk transaksi
 
 class CustomerController extends Controller
 {
@@ -48,6 +50,89 @@ class CustomerController extends Controller
         $snapToken = \Midtrans\Snap::getSnapToken($transaction);
 
         return view('payment.checkout', compact('snapToken', 'product'));
+    }
+
+    /**
+     * FUNGSI STORE REVISI: Menangani Pesanan Multi-Item & Pembayaran
+     */
+    public function store(Request $request)
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_whatsapp' => 'required|string|max:20',
+            'payment_method' => 'required|in:cashier,midtrans',
+            'items' => 'required|array'
+        ]);
+
+        return DB::transaction(function () use ($request) {
+            $subtotal = 0;
+            $admin_fee = ($request->payment_method === 'midtrans') ? 2500 : 0; // Biaya Admin
+            $orderItems = [];
+
+            // 2. Hitung Total & Siapkan Data Item
+            foreach ($request->items as $id => $item) {
+                if ($item['qty'] > 0) {
+                    $product = Product::findOrFail($id);
+                    $line_total = $product->harga * $item['qty'];
+                    $subtotal += $line_total;
+
+                    $orderItems[] = [
+                        'product_id' => $id,
+                        'qty' => $item['qty'],
+                        'price' => $product->harga,
+                        'subtotal' => $line_total,
+                    ];
+                }
+            }
+
+            $grand_total = $subtotal + $admin_fee;
+
+            // 3. Simpan ke Tabel 'orders' (Master)
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'order_id' => 'INV-' . strtoupper(uniqid()),
+                'customer_name' => $request->customer_name,
+                'customer_whatsapp' => $request->customer_whatsapp,
+                'payment_method' => $request->payment_method,
+                'amount' => $grand_total,
+                'admin_fee' => $admin_fee,
+                'status' => 'pending',
+            ]);
+
+            // 4. Simpan ke Tabel 'order_details' (Detail)
+            foreach ($orderItems as $item) {
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'qty' => $item['qty'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['subtotal'],
+                ]);
+            }
+
+            // 5. Integrasi Midtrans (Jika dipilih)
+            $paymentUrl = null;
+            if ($request->payment_method === 'midtrans') {
+                \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                \Midtrans\Config::$isProduction = false;
+
+                $transaction_details = [
+                    'order_id' => $order->order_id,
+                    'gross_amount' => $grand_total,
+                ];
+
+                $snapToken = \Midtrans\Snap::getSnapToken(['transaction_details' => $transaction_details]);
+                // Kamu bisa mengarahkan ke halaman checkout yang sudah ada
+                $paymentUrl = route('payment.checkout', ['id' => $orderItems[0]['product_id'], 'token' => $snapToken]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan berhasil dibuat!',
+                'payment_url' => $paymentUrl
+            ]);
+        });
     }
 
     public function cart()
@@ -124,6 +209,7 @@ class CustomerController extends Controller
             return back()->with('error', 'Gagal menghapus item.');
         }
     }
+
     public function orders()
     {
         // Ambil data, urutkan yang terbaru, lalu kelompokkan berdasarkan order_id

@@ -7,6 +7,7 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CheckoutController;
 
+
 /*
 |--------------------------------------------------------------------------
 | 1. PUBLIC ROUTES (Pengunjung Umum)
@@ -135,3 +136,5 @@ Route::prefix('owner')->name('owner.')->middleware(['auth', 'role:owner'])->grou
     Route::put('/pesanan/{id}/update', [OwnerController::class, 'updatePesanan'])->name('pesanan.update');
     Route::delete('/pesanan/{id}/destroy', [OwnerController::class, 'destroyPesanan'])->name('pesanan.destroy');
 });
+
+Route::post('/orders/store', [CustomerController::class, 'store'])->name('orders.store');

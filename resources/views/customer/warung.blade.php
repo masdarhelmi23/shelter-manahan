@@ -66,6 +66,10 @@
     .sidebar-title { color: #fff; font-size: 22px; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
     .sidebar-title i { color: var(--primary); }
 
+    /* FORM INPUT STYLE */
+    .label-mewah { color: #fcd34d; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .input-mewah { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; margin-bottom: 15px; outline: none; }
+
     .rincian-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .rincian-info b { display: block; color: #fff; font-size: 15px; }
     .rincian-info span { color: #94a3b8; font-size: 12px; font-weight: 600; }
@@ -185,20 +189,48 @@
                         <i class="fa-solid fa-receipt"></i> RINCIAN PESANAN
                     </div>
 
+                    <!-- IDENTITAS CUSTOMER -->
+                    <div style="margin-bottom: 20px;">
+                        <label class="label-mewah">Nama Lengkap</label>
+                        <input type="text" id="cust_name" class="input-mewah" placeholder="Contoh: Masdar Helmi">
+                        
+                        <label class="label-mewah">Nomor WhatsApp</label>
+                        <input type="number" id="cust_wa" class="input-mewah" placeholder="Contoh: 081234xxx">
+                    </div>
+
                     <div id="struk-list">
-                        <div style="text-align: center; padding: 40px 0; opacity: 0.2; color: #fff;">
-                            <i class="fa-solid fa-basket-shopping fa-4x mb-3"></i>
+                        <div style="text-align: center; padding: 20px 0; opacity: 0.2; color: #fff;">
+                            <i class="fa-solid fa-basket-shopping fa-3x mb-3"></i>
                             <p>Belum ada menu dipilih</p>
                         </div>
                     </div>
 
+                    <!-- METODE PEMBAYARAN -->
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                        <label class="label-mewah">Metode Pembayaran</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label style="color: #fff; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                <input type="radio" name="payment_method" value="cashier" checked onchange="renderStruk()"> 
+                                Bayar di Kasir (Rp 0)
+                            </label>
+                            <label style="color: #fff; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                <input type="radio" name="payment_method" value="midtrans" onchange="renderStruk()"> 
+                                Transfer / Midtrans (+Rp 2.500)
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="total-section">
-                        <div class="total-label">Estimasi Total</div>
+                        <div style="display: flex; justify-content: space-between; color: #94a3b8; font-size: 12px; margin-bottom: 5px;">
+                            <span>Biaya Admin:</span>
+                            <span id="txt-admin-fee">Rp 0</span>
+                        </div>
+                        <div class="total-label">Total Akhir</div>
                         <div class="total-amount" id="struk-total">Rp 0</div>
                     </div>
 
                     <button type="button" id="btn-gas-cart" class="btn-cart" disabled onclick="gasAddToCart()">
-                        <i class="fa-solid fa-cart-plus"></i> {{ $isOpen ? 'MASUKKAN KERANJANG' : 'WARUNG TUTUP' }}
+                        <i class="fa-solid fa-paper-plane"></i> {{ $isOpen ? 'KONFIRMASI PESANAN' : 'WARUNG TUTUP' }}
                     </button>
                 </div>
             </aside>
@@ -207,9 +239,9 @@
 
     <script>
         let keranjangSementara = {};
+        const ADMIN_FEE_MIDTRANS = 2500; // Biaya admin Midtrans
 
         function updateStruk(id, name, price, delta) {
-            // Tambahan proteksi JS jika tombol tetap diklik saat tutup
             if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") return;
 
             if (!keranjangSementara[id]) {
@@ -226,10 +258,12 @@
         function renderStruk() {
             const container = document.getElementById('struk-list');
             const totalTxt = document.getElementById('struk-total');
+            const adminFeeTxt = document.getElementById('txt-admin-fee');
             const btnCart = document.getElementById('btn-gas-cart');
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
             
             let html = '';
-            let grandTotal = 0;
+            let subtotal = 0;
             let adaItem = false;
 
             for (let id in keranjangSementara) {
@@ -237,7 +271,7 @@
                 if (item.qty > 0) {
                     adaItem = true;
                     let sub = item.price * item.qty;
-                    grandTotal += sub;
+                    subtotal += sub;
                     html += `
                         <div class="rincian-item animate__animated animate__fadeIn">
                             <div class="rincian-info">
@@ -250,45 +284,71 @@
                 }
             }
 
+            // Hitung Biaya Admin
+            let adminFee = (paymentMethod === 'midtrans') ? ADMIN_FEE_MIDTRANS : 0;
+            let grandTotal = subtotal + adminFee;
+
+            adminFeeTxt.innerText = 'Rp ' + adminFee.toLocaleString('id-ID');
+            totalTxt.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+
             if (!adaItem) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px 0; opacity: 0.2; color: #fff;"><i class="fa-solid fa-basket-shopping fa-4x mb-3"></i><p>Belum ada menu dipilih</p></div>`;
+                container.innerHTML = `<div style="text-align: center; padding: 40px 0; opacity: 0.2; color: #fff;"><i class="fa-solid fa-basket-shopping fa-3x mb-3"></i><p>Belum ada menu dipilih</p></div>`;
                 btnCart.disabled = true;
             } else {
                 container.innerHTML = html;
-                // Pastikan tombol keranjang tetap mati jika warung tutup meskipun ada item terpilih (jika ada bug CSS)
                 btnCart.disabled = ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") ? true : false;
             }
-
-            totalTxt.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
         }
 
         async function gasAddToCart() {
+            const name = document.getElementById('cust_name').value;
+            const wa = document.getElementById('cust_wa').value;
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+            // Validasi Input
+            if (!name || !wa) {
+                Swal.fire('Perhatian', 'Nama dan WhatsApp wajib diisi!', 'warning');
+                return;
+            }
+
             if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") {
                 Swal.fire('Maaf', 'Warung sudah tutup.', 'error');
                 return;
             }
 
-            Swal.fire({ title: 'Memproses...', didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Memproses Pesanan...', didOpen: () => { Swal.showLoading(); } });
 
             try {
-                for (let id in keranjangSementara) {
-                    if (keranjangSementara[id].qty > 0) {
-                        await fetch("{{ url('/cart/add') }}/" + id, {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ quantity: keranjangSementara[id].qty })
-                        });
-                    }
+                // Mengirim data pesanan secara lengkap
+                const response = await fetch("{{ route('orders.store') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        customer_name: name,
+                        customer_whatsapp: wa,
+                        payment_method: paymentMethod,
+                        items: keranjangSementara
+                    })
+                });
+
+                const result = await response.json();
+                
+                if(result.success) {
+                    Swal.fire('Berhasil!', 'Pesanan Anda telah diterima.', 'success')
+                    .then(() => {
+                        // Jika memilih Midtrans, arahkan ke payment URL
+                        if(result.payment_url) {
+                            window.location.href = result.payment_url;
+                        } else {
+                            window.location.href = "{{ route('orders.index') }}";
+                        }
+                    });
                 }
-                
-                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Pesanan masuk keranjang.' })
-                .then(() => window.location.href = "{{ route('cart.index') }}");
-                
             } catch (e) {
-                Swal.fire('Error', 'Gagal memproses pesanan', 'error');
+                Swal.fire('Error', 'Gagal memproses transaksi', 'error');
             }
         }
     </script>
