@@ -16,13 +16,12 @@
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
-    /* SHOP HEADER (STRUKTUR TETAP) */
+    /* SHOP HEADER */
     .shop-header { position: relative; padding: 60px 20px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; }
     .shop-logo { width: 140px; height: 140px; border-radius: 35px; margin: 0 auto 25px; overflow: hidden; background: #fff; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
     .shop-logo img { width: 100%; height: 100%; object-fit: cover; }
     .shop-name { font-size: 42px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 10px; }
     
-    /* JAM OPERASIONAL & STATUS */
     .shop-hours { 
         display: flex; align-items: center; gap: 12px; margin-bottom: 25px; 
         color: #cbd5e1; font-size: 14px; font-weight: 600;
@@ -119,8 +118,6 @@
             $open = \Carbon\Carbon::createFromTimeString($shop->open_time ?? '00:00');
             $close = \Carbon\Carbon::createFromTimeString($shop->close_time ?? '23:59');
             $isAutoOpen = $now->between($open, $close);
-            
-            // Warung buka HANYA JIKA (is_active true) DAN (saat ini masuk jam operasional)
             $isOpen = $shop->is_active && $isAutoOpen;
         @endphp
 
@@ -128,7 +125,6 @@
             <div class="shop-hours">
                 <i class="fa-solid fa-clock"></i>
                 <span>{{ \Carbon\Carbon::parse($shop->open_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($shop->close_time)->format('H:i') }}</span>
-
                 <span class="status-badge {{ $isOpen ? 'badge-open' : 'badge-closed' }}">
                     {{ $isOpen ? 'BUKA' : 'TUTUP' }}
                 </span>
@@ -192,7 +188,7 @@
                     <!-- IDENTITAS CUSTOMER -->
                     <div style="margin-bottom: 20px;">
                         <label class="label-mewah">Nama Lengkap</label>
-                        <input type="text" id="cust_name" class="input-mewah" placeholder="Contoh: Masdar Helmi">
+                        <input type="text" id="cust_name" class="input-mewah" placeholder="Nama Pesanan">
                         
                         <label class="label-mewah">Nomor WhatsApp</label>
                         <input type="number" id="cust_wa" class="input-mewah" placeholder="Contoh: 081234xxx">
@@ -239,9 +235,10 @@
 
     <script>
         let keranjangSementara = {};
-        const ADMIN_FEE_MIDTRANS = 2500; // Biaya admin Midtrans
+        const ADMIN_FEE_MIDTRANS = 2500;
 
         function updateStruk(id, name, price, delta) {
+            // Cek status buka lewat variabel Blade yang dipassing ke string
             if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") return;
 
             if (!keranjangSementara[id]) {
@@ -284,7 +281,6 @@
                 }
             }
 
-            // Hitung Biaya Admin
             let adminFee = (paymentMethod === 'midtrans') ? ADMIN_FEE_MIDTRANS : 0;
             let grandTotal = subtotal + adminFee;
 
@@ -296,7 +292,8 @@
                 btnCart.disabled = true;
             } else {
                 container.innerHTML = html;
-                btnCart.disabled = ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") ? true : false;
+                // Tombol hanya aktif jika ada item DAN warung buka
+                btnCart.disabled = ("{{ $isOpen }}" == "1") ? false : true;
             }
         }
 
@@ -305,7 +302,6 @@
             const wa = document.getElementById('cust_wa').value;
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-            // Validasi Input
             if (!name || !wa) {
                 Swal.fire('Perhatian', 'Nama dan WhatsApp wajib diisi!', 'warning');
                 return;
@@ -316,10 +312,14 @@
                 return;
             }
 
-            Swal.fire({ title: 'Memproses Pesanan...', didOpen: () => { Swal.showLoading(); } });
+            // Munculkan loading
+            Swal.fire({ 
+                title: 'Memproses Pesanan...', 
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); } 
+            });
 
             try {
-                // Mengirim data pesanan secara lengkap
                 const response = await fetch("{{ route('orders.store') }}", {
                     method: "POST",
                     headers: {
@@ -339,16 +339,20 @@
                 if(result.success) {
                     Swal.fire('Berhasil!', 'Pesanan Anda telah diterima.', 'success')
                     .then(() => {
-                        // Jika memilih Midtrans, arahkan ke payment URL
-                        if(result.payment_url) {
-                            window.location.href = result.payment_url;
+                        if(paymentMethod === 'midtrans') {
+                            // Redirect ke halaman checkout dengan parameter ID
+                            // Menggunakan placeholder :id untuk direplace dengan order_id asli
+                            let url = "{{ route('customer.checkout', [ 'id' => ':id' ]) }}";
+                            window.location.href = url.replace(':id', result.order_id);
                         } else {
                             window.location.href = "{{ route('orders.index') }}";
                         }
                     });
+                } else {
+                    Swal.fire('Gagal', result.message || 'Terjadi kesalahan', 'error');
                 }
             } catch (e) {
-                Swal.fire('Error', 'Gagal memproses transaksi', 'error');
+                Swal.fire('Error', 'Gagal terhubung ke server. Cek koneksi internet dan konfigurasi Midtrans kamu.', 'error');
             }
         }
     </script>

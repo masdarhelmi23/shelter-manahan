@@ -17,6 +17,7 @@ class Shop extends Model
     'open_time',
     'close_time',
     'is_active',
+    'balance',
 ];
 
     // Relasi ke User (Pemilik Toko)
@@ -25,7 +26,13 @@ class Shop extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function products() {
-    return $this->hasMany(Product::class, 'shop_id');
-}
+    public function products() 
+    {
+        return $this->hasMany(Product::class, 'shop_id');
+    }
+
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
 }

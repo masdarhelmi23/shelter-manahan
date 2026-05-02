@@ -10,9 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class, // Tambahkan baris ini
+        ]);
+        $middleware->validateCsrfTokens(except: [
+            'api/midtrans/callback', 
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

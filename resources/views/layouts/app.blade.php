@@ -43,7 +43,6 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            /* TAMBAHKAN PADDING TOP SEBESAR TINGGI NAVBAR (85px) */
             padding-top: 85px; 
             background-image: 
                 linear-gradient(to bottom, rgba(0, 0, 0, .85), rgba(0, 0, 0, .65)),
@@ -51,11 +50,11 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed; 
-            background-repeat: no-no-repeat;
+            background-repeat: no-repeat;
         }
 
         /* =========================================
-            NAVBAR STYLE (DIATUR FIXED AGAR TIDAK KEGESER)
+            NAVBAR STYLE
         ========================================= */
         .navbar {
             height: 85px;
@@ -64,7 +63,6 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
-            /* UBAH KE FIXED AGAR TERKUNCI DI ATAS LAYAR */
             position: fixed; 
             top: 0;
             left: 0;
@@ -185,7 +183,7 @@
         }
 
         /* =========================================
-            MAIN CONTENT AREA (FLOATING CARD EFFECT)
+            MAIN CONTENT AREA
         ========================================= */
         .main-content {
             flex: 1;
@@ -194,7 +192,6 @@
             max-width: 1600px;
             margin: 20px auto 40px; 
             animation: fadeIn 0.8s ease;
-            
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -228,11 +225,6 @@
         /* =========================================
             RESPONSIVE DESIGN
         ========================================= */
-        @media (max-width: 1150px) {
-            .navbar { padding: 0 3%; }
-            .nav-item { padding: 10px 14px; font-size: 12px; }
-        }
-
         @media (max-width: 1024px) {
             .menu-toggle { display: flex; }
             .nav-links {
@@ -282,18 +274,6 @@
             .btn-logout { width: auto; padding: 14px 25px; }
             .main-content { margin: 15px; border-radius: 25px; }
         }
-
-        @media (max-width: 768px) {
-            .navbar { height: 75px; }
-            .nav-links { top: 75px; }
-            /* KOMPENSASI PADDING UNTUK MOBILE NAVBAR */
-            .page-container { padding-top: 75px; } 
-            .brand { font-size: 19px; }
-            .user-info { text-align: left; }
-            .user-menu { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .btn-logout { width: 100%; justify-content: center; }
-            .main-content { padding: 30px 15px; }
-        }
     </style>
 </head>
 <body>
@@ -314,6 +294,11 @@
                         <a href="{{ route('admin.shops') }}" class="nav-item {{ request()->routeIs('admin.shops') ? 'active' : '' }}">
                             <i class="fa-solid fa-shop"></i> KONTROL TOKO
                         </a>
+                        <!-- MENU WITHDRAW UNTUK ADMIN -->
+                        <a href="{{ route('admin.withdrawals') }}" class="nav-item {{ request()->routeIs('admin.withdrawals') ? 'active' : '' }}">
+                            <i class="fa-solid fa-money-bill-transfer"></i> PENARIKAN TENANT
+                        </a>
+
                     @elseif(auth()->user()->role === 'owner')
                         <a href="{{ route('owner.dashboard') }}" class="nav-item {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-gauge-high"></i> DASHBOARD
@@ -327,6 +312,14 @@
                         <a href="{{ route('owner.pengaturan') }}" class="nav-item {{ request()->routeIs('owner.pengaturan') ? 'active' : '' }}">
                             <i class="fa-solid fa-gears"></i> PENGATURAN
                         </a>
+
+                        <!-- INTEGRASI MENU SALDO OWNER -->
+                        @if(auth()->user()->shop)
+                            <a href="{{ route('owner.withdraw.index') }}" class="nav-item" style="color: #16a34a; background: rgba(22, 163, 74, 0.05);">
+                                <i class="fa-solid fa-wallet"></i> RP {{ number_format(auth()->user()->shop->balance ?? 0, 0, ',', '.') }}
+                            </a>
+                        @endif
+
                     @elseif(auth()->user()->role === 'customer')
                         <a href="{{ url('/') }}" class="nav-item {{ request()->is('/') ? 'active' : '' }}">
                             <i class="fa-solid fa-utensils"></i> KATALOG
@@ -339,6 +332,7 @@
                             <i class="fa-solid fa-receipt"></i> PESANAN SAYA
                         </a>
                     @endif
+
                     <div class="user-menu">
                         <div class="user-info">
                             <span class="user-name">{{ auth()->user()->name }}</span>
@@ -382,15 +376,6 @@
                 } else {
                     toggleIcon.classList.replace('fa-xmark', 'fa-bars');
                 }
-            });
-
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    if (window.innerWidth <= 1024) {
-                        mobileMenu.classList.remove('show');
-                        toggleIcon.classList.replace('fa-xmark', 'fa-bars');
-                    }
-                });
             });
 
             window.addEventListener('resize', () => {

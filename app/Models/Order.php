@@ -7,23 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'user_id',
-        'product_id',
-        'order_id',
-        'amount',
-        'status',
-        'snap_token'
+        'user_id',           // User yang login (opsional)
+        'order_id',          // Kode Invoice (INV-XXXXX)
+        'customer_name',     // Nama yang diinput pembeli
+        'customer_whatsapp', // WA yang diinput pembeli
+        'payment_method',    // 'kasir' atau 'midtrans'
+        'admin_fee',         // Biaya tambahan Rp 2.500
+        'amount',            // Total harga keseluruhan
+        'status',            // pending/success/expired
+        'snap_token'         // Token dari Midtrans
     ];
 
-    // RELASI KE USER (pembeli)
+    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // RELASI KE PRODUCT
-    public function product()
+    // RELASI UTAMA: Satu Pesanan punya banyak barang (Detail)
+    public function details()
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(OrderDetail::class);
     }
 }

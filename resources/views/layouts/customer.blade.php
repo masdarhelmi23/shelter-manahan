@@ -42,15 +42,6 @@
         }
         .nav-item:hover, .nav-item.active { color: var(--primary); background: var(--primary-soft); }
 
-        /* Keranjang & Badge */
-        .cart-link { position: relative; display: flex; align-items: center; }
-        .cart-badge { 
-            background: #f43f5e; color: #fff; font-size: 9px; 
-            padding: 2px 6px; border-radius: 50px; font-weight: 800;
-            position: absolute; top: -5px; right: -5px;
-            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
-        }
-
         .user-menu { display: flex; align-items: center; gap: 12px; border-left: 2px solid #e2e8f0; padding-left: 15px; margin-left: 10px; }
         .btn-logout { background: var(--merah-logout); color: #fff; border: none; padding: 8px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-logout:hover { filter: brightness(0.9); transform: translateY(-1px); }
@@ -71,14 +62,6 @@
             
             @if(auth()->check())
                 <a href="{{ route('orders.index') }}" class="nav-item {{ request()->routeIs('orders.index') ? 'active' : '' }}"><i class="fa-solid fa-receipt"></i> Pesanan</a>
-                
-                <a href="{{ route('cart.index') }}" class="nav-item cart-link {{ request()->routeIs('cart.index') ? 'active' : '' }}">
-                    <i class="fa-solid fa-shopping-cart" style="font-size: 16px;"></i>
-                    <span class="cart-badge" id="cartCount">
-                        {{-- Logika dinamis hitung total porsi di keranjang --}}
-                        {{ \App\Models\Cart::where('user_id', auth()->id())->sum('quantity') }}
-                    </span>
-                </a>
 
                 <div class="user-menu">
                     <span style="font-weight: 700; font-size: 13px; color: var(--teks-gelap);">{{ auth()->user()->name }}</span>
@@ -95,5 +78,6 @@
 
     @yield('content')
 
+    @yield('extra-js')
 </body>
 </html>

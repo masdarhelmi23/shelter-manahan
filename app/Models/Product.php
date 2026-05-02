@@ -45,4 +45,9 @@ class Product extends Model
     {
         return $this->hasMany(Order::class);
     }
+    public function details()
+    {
+        // Produk ini muncul di banyak baris detail pesanan
+        return $this->hasMany(OrderDetail::class, 'product_id');
+    }
 }
