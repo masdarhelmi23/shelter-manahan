@@ -82,7 +82,7 @@
         background: rgba(255,255,255,0.05);
     }
 
-    .status-badge { padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .status-badge { padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
     .status-active { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
     .status-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
 
@@ -96,22 +96,94 @@
         font-weight: 800;
         outline: none;
         cursor: pointer;
+        width: 100%;
+        max-width: 150px;
     }
 
     .btn-save-status, .btn-view-detail {
         width: 40px; height: 40px;
         border-radius: 12px; cursor: pointer;
         display: inline-flex; align-items: center; justify-content: center;
-        transition: 0.3s; border: none; color: white;
+        transition: 0.3s; border: none; color: white; flex-shrink: 0;
     }
 
     .btn-save-status { background: #0284c7; }
     .btn-save-status:hover { background: #0ea5e9; transform: translateY(-3px); }
 
-    .btn-view-detail { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-view-detail { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
     .btn-view-detail:hover { background: #fcd34d; color: #000; transform: translateY(-3px); }
 
     .tooltip-text { font-size: 10px; color: #94a3b8; margin-top: 10px; display: block; text-align: center; }
+
+    /* ================= RESPONSIVE MOBILE REVISION ================= */
+    @media (max-width: 768px) {
+        .page-header h1 { font-size: 26px; }
+        .page-header p { font-size: 11px; }
+
+        .summary-card { padding: 15px; flex-direction: row; gap: 15px; }
+        .summary-icon { width: 50px; height: 50px; font-size: 20px; }
+        .summary-info h2 { font-size: 20px; }
+
+        .luxury-card { padding: 15px; border-radius: 20px; }
+
+        /* Hide Table Header on Mobile */
+        .custom-table thead { display: none; }
+        
+        .custom-table, .custom-table tbody, .custom-table tr, .custom-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .custom-table tr {
+            margin-bottom: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .custom-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5px;
+            text-align: right;
+            border: none !important;
+            font-size: 13px;
+        }
+
+        .custom-table td:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* Add Label using Data Attribute */
+        .custom-table td::before {
+            content: attr(data-label);
+            font-weight: 800;
+            color: #fcd34d;
+            text-transform: uppercase;
+            font-size: 10px;
+            text-align: left;
+            margin-right: 10px;
+        }
+
+        /* Spesifik style untuk kolom Identitas Toko di Mobile */
+        .custom-table td[data-label="Identitas Toko"] {
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            padding-top: 5px;
+        }
+        .custom-table td[data-label="Identitas Toko"]::before { width: 100%; margin-bottom: 5px; }
+        
+        .custom-table td[data-label="Aksi & Otoritas"] {
+            justify-content: center;
+            padding-top: 20px;
+        }
+
+        .select-status { max-width: 100%; }
+        .tooltip-text { font-size: 9px; }
+    }
 </style>
 
 <div class="management-container">
@@ -121,7 +193,6 @@
             <p>Kontrol Otoritas & Status Operasional Shelter Manahan</p>
         </div>
 
-        <!-- REVISI: Penambahan Ringkasan Total Saldo Seluruh Toko -->
         <div class="summary-card">
             <div class="summary-icon">
                 <i class="fa-solid fa-vault"></i>
@@ -133,13 +204,13 @@
         </div>
 
         @if(session('success'))
-            <div style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 20px; border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(74, 222, 128, 0.3);">
+            <div style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 15px; border-radius: 15px; margin-bottom: 30px; border: 1px solid rgba(74, 222, 128, 0.3); font-size: 14px;">
                 <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
             </div>
         @endif
 
         <div class="luxury-card">
-            <div style="overflow-x: auto;">
+            <div class="table-responsive-wrapper">
                 <table class="custom-table">
                     <thead>
                         <tr>
@@ -154,10 +225,11 @@
                     <tbody>
                         @forelse($shops as $index => $shop)
                         <tr ondblclick="window.location='{{ route('admin.shops.show', $shop->id) }}'" title="Klik 2x untuk detail lengkap">
-                            <td style="color: #94a3b8; font-weight: 800;">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</td>
-                            <td>
+                            <td data-label="#">
+                                <span style="color: #94a3b8; font-weight: 800;">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            </td>
+                            <td data-label="Identitas Toko">
                                 <div style="display: flex; align-items: center; gap: 15px;">
-                                    <!-- REVISI: Penambahan Logo Toko -->
                                     @if($shop->logo)
                                         <img src="{{ asset('storage/' . $shop->logo) }}" class="table-store-logo">
                                     @else
@@ -165,35 +237,37 @@
                                             <i class="fa-solid fa-store"></i>
                                         </div>
                                     @endif
-                                    <div>
+                                    <div style="text-align: left;">
                                         <div style="font-weight: 800; font-size: 16px;">{{ $shop->name }}</div>
                                         <div style="font-size: 11px; color: #fcd34d;">ID: #SHP-{{ $shop->id }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <div style="font-size: 14px; font-weight: 700;">{{ $shop->user->name ?? 'N/A' }}</div>
-                                <div style="font-size: 11px; color: #94a3b8;">{{ $shop->user->email ?? '-' }}</div>
+                            <td data-label="Pemilik Sistem">
+                                <div style="text-align: right;">
+                                    <div style="font-size: 14px; font-weight: 700;">{{ $shop->user->name ?? 'N/A' }}</div>
+                                    <div style="font-size: 11px; color: #94a3b8;">{{ $shop->user->email ?? '-' }}</div>
+                                </div>
                             </td>
-                            <td>
+                            <td data-label="Saldo (IDR)">
                                 <div style="font-weight: 800; color: #4ade80;">Rp {{ number_format($shop->balance ?? 0, 0, ',', '.') }}</div>
                             </td>
-                            <td>
+                            <td data-label="Status Saat Ini">
                                 <span class="status-badge {{ $shop->status == 'active' ? 'status-active' : 'status-pending' }}">
                                     {{ $shop->status == 'active' ? 'AKTIF' : 'NON-AKTIF' }}
                                 </span>
                             </td>
-                            <td style="text-align: center;">
-                                <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <td data-label="Aksi & Otoritas">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                     <a href="{{ route('admin.shops.show', $shop->id) }}" class="btn-view-detail" title="Lihat Profil & Riwayat">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
 
-                                    <form action="{{ route('admin.shops.approve', $shop->id) }}" method="POST" style="display: flex; gap: 10px; margin: 0;">
+                                    <form action="{{ route('admin.shops.approve', $shop->id) }}" method="POST" style="display: flex; gap: 8px; margin: 0;">
                                         @csrf
                                         <select name="status" class="select-status">
-                                            <option value="active" {{ $shop->status == 'active' ? 'selected' : '' }}>SET AKTIF</option>
-                                            <option value="pending" {{ $shop->status == 'pending' ? 'selected' : '' }}>SET NON-AKTIF</option>
+                                            <option value="active" {{ $shop->status == 'active' ? 'selected' : '' }}>AKTIF</option>
+                                            <option value="pending" {{ $shop->status == 'pending' ? 'selected' : '' }}>OFF</option>
                                         </select>
                                         <button type="submit" class="btn-save-status" title="Simpan Perubahan">
                                             <i class="fa-solid fa-shield-halved"></i>
@@ -204,7 +278,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 80px; color: #94a3b8;">
+                            <td colspan="6" style="text-align: center; padding: 60px; color: #94a3b8;">
                                 <i class="fa-solid fa-database" style="font-size: 40px; display: block; margin-bottom: 20px; opacity: 0.3;"></i>
                                 <span style="font-style: italic;">Tidak ada data toko yang ditemukan.</span>
                             </td>
@@ -212,7 +286,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                <span class="tooltip-text">* Tips: Klik dua kali pada baris tabel untuk melihat riwayat transaksi dan profil lengkap toko.</span>
+                <span class="tooltip-text">* Tips: Klik dua kali pada kartu toko untuk melihat riwayat transaksi dan profil lengkap.</span>
             </div>
         </div>
     </div>

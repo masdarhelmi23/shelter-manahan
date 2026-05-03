@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --primary: #0284c7;
@@ -36,9 +38,7 @@
             background: #000;
         }
 
-        /* =========================================
-            PAGE CONTAINER & LOCKED BACKGROUND
-        ========================================= */
+        /* PAGE CONTAINER & LOCKED BACKGROUND */
         .page-container {
             min-height: 100vh;
             display: flex;
@@ -53,9 +53,7 @@
             background-repeat: no-repeat;
         }
 
-        /* =========================================
-            NAVBAR STYLE
-        ========================================= */
+        /* NAVBAR STYLE */
         .navbar {
             height: 85px;
             background: var(--bg-topbar);
@@ -83,19 +81,10 @@
             gap: 5px;
         }
 
-        .brand span {
-            color: var(--teks-gelap);
-            font-weight: 400;
-        }
+        .brand span { color: var(--teks-gelap); font-weight: 400; }
 
-        /* =========================================
-            NAVIGATION LINKS
-        ========================================= */
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* NAVIGATION LINKS */
+        .nav-links { display: flex; align-items: center; gap: 8px; }
 
         .nav-item {
             text-decoration: none;
@@ -113,12 +102,9 @@
             text-transform: uppercase;
         }
 
-        .nav-item i {
-            font-size: 15px;
-        }
+        .nav-item i { font-size: 15px; }
 
-        .nav-item:hover,
-        .nav-item.active {
+        .nav-item:hover, .nav-item.active {
             color: var(--primary);
             background: var(--primary-soft);
         }
@@ -134,9 +120,7 @@
             box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
         }
 
-        /* =========================================
-            USER MENU & PROFILE
-        ========================================= */
+        /* USER MENU & PROFILE */
         .user-menu {
             display: flex;
             align-items: center;
@@ -146,9 +130,7 @@
             margin-left: 10px;
         }
 
-        .user-info {
-            text-align: right;
-        }
+        .user-info { text-align: right; }
 
         .user-name {
             font-size: 14px;
@@ -182,15 +164,13 @@
             transform: translateY(-1px);
         }
 
-        /* =========================================
-            MAIN CONTENT AREA
-        ========================================= */
+        /* MAIN CONTENT AREA - REVISED FOR CENTER SYMMETRY */
         .main-content {
             flex: 1;
-            padding: 40px 5%;
+            padding: 40px 0; /* Padding atas bawah saja, samping pakai margin auto */
             width: 100%;
-            max-width: 1600px;
-            margin: 20px auto 40px; 
+            max-width: 1300px;
+            margin: 20px auto; 
             animation: fadeIn 0.8s ease;
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(15px);
@@ -198,6 +178,17 @@
             border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             min-height: calc(100vh - 165px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Memastikan isi di dalamnya bisa di-center */
+        }
+
+        /* Pembungkus isi yield agar konsisten */
+        .yield-wrapper {
+            width: 100%;
+            padding: 0 25px; /* Jarak aman kiri-kanan yang seimbang */
+            box-sizing: border-box;
         }
 
         @keyframes fadeIn {
@@ -210,28 +201,19 @@
             font-size: 24px;
             color: var(--primary);
             cursor: pointer;
-            width: 45px;
-            height: 45px;
+            width: 45px; height: 45px;
             border-radius: 12px;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
         }
 
-        .menu-toggle:hover {
-            background: var(--primary-soft);
-        }
-
-        /* =========================================
-            RESPONSIVE DESIGN
-        ========================================= */
+        /* RESPONSIVE DESIGN */
         @media (max-width: 1024px) {
             .menu-toggle { display: flex; }
             .nav-links {
                 position: fixed;
-                top: 85px;
-                left: 0;
-                right: 0;
+                top: 85px; left: 0; right: 0;
                 background: #ffffff;
                 box-shadow: 0 15px 35px rgba(0,0,0,.15);
                 padding: 25px;
@@ -251,28 +233,25 @@
                 transform: translateY(0);
             }
 
-            .nav-item {
-                width: 100%;
-                padding: 16px 20px;
-                border-radius: 14px;
-                font-size: 14px;
-                background: #f8fafc;
-            }
-
             .user-menu {
                 border-left: none;
                 border-top: 2px solid #f1f5f9;
-                padding-left: 0;
-                margin-left: 0;
-                padding-top: 20px;
-                margin-top: 10px;
+                padding-left: 0; margin-left: 0;
+                padding-top: 20px; margin-top: 10px;
                 width: 100%;
                 justify-content: space-between;
-                flex-direction: row;
             }
 
-            .btn-logout { width: auto; padding: 14px 25px; }
-            .main-content { margin: 15px; border-radius: 25px; }
+            .main-content { 
+                margin: 15px; 
+                padding: 30px 0; 
+                border-radius: 30px; 
+                width: calc(100% - 30px); /* Memastikan seimbang kiri-kanan */
+            }
+            
+            .yield-wrapper {
+                padding: 0 15px; /* Spasi lebih rapat di HP agar konten luas */
+            }
         }
     </style>
 </head>
@@ -294,7 +273,6 @@
                         <a href="{{ route('admin.shops') }}" class="nav-item {{ request()->routeIs('admin.shops') ? 'active' : '' }}">
                             <i class="fa-solid fa-shop"></i> KONTROL TOKO
                         </a>
-                        <!-- MENU WITHDRAW UNTUK ADMIN -->
                         <a href="{{ route('admin.withdrawals') }}" class="nav-item {{ request()->routeIs('admin.withdrawals') ? 'active' : '' }}">
                             <i class="fa-solid fa-money-bill-transfer"></i> PENARIKAN TENANT
                         </a>
@@ -313,7 +291,6 @@
                             <i class="fa-solid fa-gears"></i> PENGATURAN
                         </a>
 
-                        <!-- INTEGRASI MENU SALDO OWNER -->
                         @if(auth()->user()->shop)
                             <a href="{{ route('owner.withdraw.index') }}" class="nav-item" style="color: #16a34a; background: rgba(22, 163, 74, 0.05);">
                                 <i class="fa-solid fa-wallet"></i> RP {{ number_format(auth()->user()->shop->balance ?? 0, 0, ',', '.') }}
@@ -359,7 +336,9 @@
         </nav>
 
         <main class="main-content">
-            @yield('content')
+            <div class="yield-wrapper">
+                @yield('content')
+            </div>
         </main>
     </div>
 

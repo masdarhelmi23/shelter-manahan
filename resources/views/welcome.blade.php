@@ -20,17 +20,17 @@
 }
 
 body{
-    background:#f1f5f9;
+    background:linear-gradient(180deg,#f1f5f9,#e2e8f0);
     color:#111827;
     overflow-x:hidden;
 }
 
-/* HERO */
+/* HERO PREMIUM */
 .hero{
-    min-height:72vh;
+    min-height:75vh;
     position:relative;
     background:
-    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.70)),
+    linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
     url('{{ asset("images/bg-shelter.jpg") }}');
     background-size:cover;
     background-position:center;
@@ -44,27 +44,33 @@ body{
 .hero-content{
     max-width:850px;
     z-index:2;
+    animation:fadeUp 1s ease;
+}
+
+@keyframes fadeUp{
+    from{opacity:0;transform:translateY(40px);}
+    to{opacity:1;transform:translateY(0);}
 }
 
 .badge-top{
     display:inline-block;
-    background:rgba(255,255,255,.15);
+    background:rgba(255,255,255,.12);
     color:#fff;
-    padding:10px 18px;
+    padding:10px 20px;
     border-radius:50px;
     font-size:12px;
     font-weight:800;
     letter-spacing:2px;
     margin-bottom:20px;
-    backdrop-filter:blur(10px);
+    backdrop-filter:blur(12px);
 }
 
 .hero h1{
-    font-size:clamp(34px,8vw,68px);
+    font-size:clamp(36px,8vw,72px);
     color:#fff;
-    font-weight:800;
-    line-height:1.1;
+    font-weight:900;
     margin-bottom:18px;
+    letter-spacing:-1px;
 }
 
 .hero p{
@@ -75,26 +81,27 @@ body{
     margin:auto;
 }
 
-/* SEARCH BOX / MAP BOX */
+/* MAP BOX PREMIUM */
 .hero-box{
-    background:#fff;
+    background:rgba(255,255,255,0.9);
+    backdrop-filter:blur(14px);
     max-width:1100px;
-    margin:-60px auto 0;
-    border-radius:24px;
+    margin:-70px auto 0;
+    border-radius:26px;
     padding:20px;
-    box-shadow:0 25px 60px rgba(0,0,0,.15);
+    box-shadow:0 30px 80px rgba(0,0,0,.15);
     position:relative;
     z-index:5;
 }
 
 .map-box{
     overflow:hidden;
-    border-radius:18px;
+    border-radius:20px;
 }
 
 .map-box iframe{
     width:100%;
-    height:280px;
+    height:300px;
     border:0;
 }
 
@@ -102,81 +109,107 @@ body{
 .container{
     max-width:1300px;
     margin:auto;
-    padding:60px 25px;
+    padding:70px 25px;
 }
 
 .section-title{
-    font-size:34px;
-    font-weight:800;
+    font-size:36px;
+    font-weight:900;
     margin-bottom:10px;
     text-align:center;
-    color:#0f172a;
 }
 
 .section-sub{
     text-align:center;
     color:#64748b;
-    margin-bottom:45px;
+    margin-bottom:50px;
 }
 
 /* GRID */
 .grid-warung{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
-    gap:28px;
+    gap:30px;
 }
 
-/* CARD REVISED FOR STATUS BADGE */
+/* CARD PREMIUM */
 .card-warung{
-    background:#fff;
-    border-radius:24px;
+    background:rgba(255,255,255,0.95);
+    border-radius:26px;
     padding:30px;
     text-decoration:none;
     color:inherit;
-    transition:.35s ease;
+    transition:.4s ease;
     box-shadow:0 10px 25px rgba(0,0,0,.06);
-    border:1px solid #e5e7eb;
-    position: relative; /* Wajib untuk posisi badge */
+    border:1px solid rgba(255,255,255,0.5);
+    position: relative;
     overflow: hidden;
+    backdrop-filter:blur(10px);
+    display: block; /* Memastikan element a berfungsi penuh */
+}
+
+.card-warung::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.4),transparent);
+    opacity:0;
+    transition:.5s;
+}
+
+.card-warung:hover::before{
+    opacity:1;
 }
 
 .card-warung:hover{
-    transform:translateY(-8px);
-    box-shadow:0 25px 45px rgba(0,0,0,.12);
+    transform:translateY(-10px) scale(1.02);
+    box-shadow:0 30px 60px rgba(0,0,0,.15);
 }
 
-/* BADGE STATUS STYLE */
+/* STATUS BADGE */
 .status-tag {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 18px;
+    right: 18px;
     padding: 6px 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     display: flex;
     align-items: center;
     gap: 5px;
+    z-index: 3;
 }
-.status-open { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
-.status-closed { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-.dot-ping { width: 6px; height: 6px; border-radius: 50%; }
-.bg-open { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.status-open { background: #ecfdf5; color: #16a34a; }
+.status-closed { background: #fef2f2; color: #dc2626; }
+
+.dot-ping {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation:ping 1.5s infinite;
+}
+@keyframes ping{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.6);opacity:.5;}
+    100%{transform:scale(1);}
+}
+.bg-open { background: #22c55e; }
 .bg-closed { background: #ef4444; }
 
+/* ICON */
 .icon-box{
     width:95px;
     height:95px;
-    border-radius:22px;
+    border-radius:24px;
     background:#f8fafc;
     overflow:hidden;
     margin:auto auto 18px;
     display:flex;
     align-items:center;
     justify-content:center;
-    border:1px solid #e2e8f0;
+    border: 1px solid #e2e8f0;
 }
 
 .icon-box img{
@@ -185,14 +218,15 @@ body{
     object-fit:cover;
 }
 
+/* TEXT */
 .shop-name{
     text-align:center;
     font-size:22px;
     font-weight:800;
     margin-bottom:18px;
-    color:#0f172a;
 }
 
+/* PILLS */
 .produk-preview{
     display:flex;
     flex-wrap:wrap;
@@ -202,22 +236,32 @@ body{
 }
 
 .pill{
-    background:#eff6ff;
-    color:#2563eb;
+    background:#e0f2fe;
+    color:#0369a1;
     padding:7px 12px;
     border-radius:50px;
     font-size:12px;
     font-weight:700;
+    transition:.2s;
+}
+.pill:hover{
+    transform:scale(1.05);
 }
 
+/* BUTTON */
 .btn-lihat{
     background:linear-gradient(135deg,var(--primary),var(--primary2));
     color:#fff;
     text-align:center;
     padding:14px;
-    border-radius:14px;
+    border-radius:16px;
     font-size:14px;
     font-weight:800;
+    transition:.3s;
+}
+.btn-lihat:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(0,123,255,.4);
 }
 
 /* FOOTER */
@@ -225,18 +269,17 @@ footer{
     background:#0f172a;
     color:#94a3b8;
     text-align:center;
-    padding:40px 20px;
-    margin-top:50px;
+    padding:50px 20px;
+    margin-top:60px;
 }
 
-/* ================= MOBILE RESPONSIVE ================= */
+/* MOBILE */
 @media(max-width:768px){
-    .hero{ min-height:58vh; padding:20px 15px; }
+    .hero{ min-height:60vh; }
     .hero h1{ font-size:34px; }
-    .hero-box{ margin:-28px 14px 0; padding:12px; }
-    .container{ padding:35px 14px; }
-    .section-title{ font-size:26px; }
-    .grid-warung{ grid-template-columns:1fr; gap:16px; }
+    .hero-box{ margin:-30px 14px 0; }
+    .container{ padding:40px 15px; }
+    .grid-warung{ grid-template-columns:1fr; gap:18px; }
 }
 </style>
 @endsection
@@ -274,9 +317,12 @@ footer{
                 $isJamOperasional = $sekarang->between($jamBuka, $jamTutup);
                 $sedangLibur = $shop->closed_until && $sekarang->lessThanOrEqualTo(\Carbon\Carbon::parse($shop->closed_until));
                 $isBuka = $isJamOperasional && !$sedangLibur;
+
+                // FIX: Logika URL Fallback jika slug NULL
+                $targetUrl = $shop->slug ? route('customer.warung', $shop->slug) : route('customer.warung', $shop->id);
             @endphp
 
-            <a href="{{ $shop->slug ? route('customer.warung', $shop->slug) : '#' }}" class="card-warung">
+            <a href="{{ $targetUrl }}" class="card-warung">
                 <!-- BADGE STATUS -->
                 @if($isBuka)
                     <div class="status-tag status-open">
@@ -290,7 +336,7 @@ footer{
 
                 <div class="icon-box">
                     @if($shop->logo)
-                        <img src="{{ asset('storage/' . $shop->logo) }}">
+                        <img src="{{ asset('storage/' . $shop->logo) }}" alt="{{ $shop->name }}">
                     @else
                         <i class="fas fa-store" style="font-size:35px;color:#0ea5e9;"></i>
                     @endif
@@ -300,6 +346,7 @@ footer{
 
                 <div class="produk-preview">
                     @php $count = 0; @endphp
+                    {{-- Pastikan relasi products dipanggil dengan benar --}}
                     @forelse($shop->products->where('status','aktif') as $prod)
                         @if($count < 4)
                             <span class="pill">{{ $prod->nama_produk }}</span>

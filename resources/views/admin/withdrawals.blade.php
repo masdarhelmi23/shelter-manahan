@@ -43,16 +43,15 @@
         border-radius: 35px;
         padding: 40px;
         box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-        overflow-x: auto;
         animation: fadeIn 1s ease-out;
     }
 
     /* Styling Tabel */
-    .table-admin { width: 100%; border-collapse: collapse; color: #fff; min-width: 1000px; }
+    .table-admin { width: 100%; border-collapse: collapse; color: #fff; }
     .table-admin th { 
         text-align: left; 
         padding: 15px 12px; 
-        color: #fcd34d; /* Warna Emas untuk Header */
+        color: #fcd34d; 
         font-size: 11px; 
         font-weight: 800; 
         text-transform: uppercase;
@@ -66,13 +65,6 @@
         border-bottom: 1px solid rgba(255,255,255,0.03);
     }
 
-    /* Detail Kolom Spesifik */
-    .text-waktu { color: #94a3b8; font-size: 12px; line-height: 1.5; }
-    .text-warung { font-weight: 800; color: #fff; font-size: 14px; }
-    .text-saldo { color: #94a3b8; font-size: 12px; }
-    .text-nominal { color: #4ade80; font-weight: 800; font-size: 15px; } 
-    .text-rekening { color: #cbd5e1; font-size: 12px; font-weight: 500; }
-
     /* Badge Status */
     .badge-status {
         padding: 6px 14px;
@@ -81,6 +73,7 @@
         font-weight: 900;
         letter-spacing: 0.5px;
         display: inline-block;
+        text-transform: uppercase;
     }
     .status-menunggu { background: rgba(252, 211, 77, 0.1); color: #fcd34d; border: 1px solid rgba(252, 211, 77, 0.2); }
     .status-berhasil { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
@@ -102,17 +95,60 @@
         text-transform: uppercase;
     }
     .btn-approve { background: #10b981; }
-    .btn-approve:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+    .btn-approve:hover { background: #059669; transform: translateY(-2px); }
     .btn-reject { background: #ef4444; }
-    .btn-reject:hover { background: #b91c1c; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); }
+    .btn-reject:hover { background: #b91c1c; transform: translateY(-2px); }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* RESPONSIVE MOBILE OPTIMIZATION */
+    @media (max-width: 992px) {
+        .kartu-admin-mewah { padding: 20px; border-radius: 25px; }
+        
+        .table-admin thead { display: none; } /* Sembunyikan header tabel di mobile */
+        .table-admin, .table-admin tbody, .table-admin tr, .table-admin td {
+            display: block;
+            width: 100%;
+        }
+
+        .table-admin tr {
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .table-admin td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+            padding: 12px 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .table-admin td:last-child { border-bottom: none; justify-content: center; padding-top: 20px; }
+
+        /* Label untuk Mobile */
+        .table-admin td::before {
+            content: attr(data-label);
+            font-weight: 800;
+            color: #fcd34d;
+            text-transform: uppercase;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .summary-wd-card { padding: 20px; gap: 15px; }
+        .summary-wd-info h2 { font-size: 22px; }
+    }
 </style>
 
 <div class="judul-halaman">Manajemen Keuangan</div>
 <span class="subjudul-halaman">Verifikasi Penarikan Dana Tenant</span>
 
-<!-- FITUR BARU: Total Dana yang Pernah di WD -->
+<!-- Total Dana yang Pernah di WD -->
 <div class="summary-wd-card">
     <div class="summary-wd-icon">
         <i class="fas fa-hand-holding-dollar"></i>
@@ -129,7 +165,7 @@
             <tr>
                 <th>Waktu Pengajuan</th>
                 <th>Nama Warung</th>
-                <th>Saldo Terkini Toko</th>
+                <th>Saldo Terkini</th>
                 <th>Nominal WD</th>
                 <th>Info Rekening</th>
                 <th>Status</th>
@@ -139,29 +175,29 @@
         <tbody>
             @forelse($withdrawals as $wd)
             <tr>
-                <td class="text-waktu">
-                    {{ $wd->created_at->format('d M Y') }}<br>
-                    {{ $wd->created_at->format('H:i') }} WIB
+                <td data-label="Waktu">
+                    <div style="text-align: inherit;">
+                        <span style="color: #fff; font-weight: 600;">{{ $wd->created_at->format('d M Y') }}</span><br>
+                        <span style="color: #94a3b8; font-size: 11px;">{{ $wd->created_at->format('H:i') }} WIB</span>
+                    </div>
                 </td>
-                <td class="text-warung">{{ $wd->shop->name ?? 'Toko Tidak Ditemukan' }}</td>
-                <td class="text-saldo">Rp {{ number_format($wd->shop->balance ?? 0, 0, ',', '.') }}</td>
-                <td class="text-nominal">Rp {{ number_format($wd->amount, 0, ',', '.') }}</td>
-                <td class="text-rekening">{{ $wd->bank_info }}</td>
-                <td>
+                <td data-label="Warung" style="font-weight: 800; color: #fff;">{{ $wd->shop->name ?? 'Toko Tidak Ditemukan' }}</td>
+                <td data-label="Saldo Toko" style="color: #cbd5e1;">Rp {{ number_format($wd->shop->balance ?? 0, 0, ',', '.') }}</td>
+                <td data-label="Nominal WD" style="color: #4ade80; font-weight: 800;">Rp {{ number_format($wd->amount, 0, ',', '.') }}</td>
+                <td data-label="Rekening" style="color: #cbd5e1; font-size: 12px;">{{ $wd->bank_info }}</td>
+                <td data-label="Status">
                     <span class="badge-status status-{{ $wd->status == 'pending' ? 'menunggu' : ($wd->status == 'success' ? 'berhasil' : 'ditolak') }}">
                         {{ $wd->status == 'pending' ? 'MENUNGGU' : strtoupper($wd->status) }}
                     </span>
                 </td>
-                <td>
+                <td data-label="Tindakan">
                     @if($wd->status == 'pending')
-                    <div style="display: flex; gap: 8px; justify-content: center;">
-                        <!-- Tombol Approve -->
+                    <div style="display: flex; gap: 10px; justify-content: center;">
                         <button type="button" class="btn-aksi btn-approve" onclick="confirmApprove({{ $wd->id }})">
                             <i class="fas fa-check"></i> APPROVE
                         </button>
                         <form id="form-approve-{{ $wd->id }}" action="{{ route('admin.withdrawals.approve', $wd->id) }}" method="POST" style="display:none;">@csrf</form>
 
-                        <!-- Tombol Reject -->
                         <button type="button" class="btn-aksi btn-reject" onclick="confirmReject({{ $wd->id }})">
                             <i class="fas fa-times"></i> REJECT
                         </button>

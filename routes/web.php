@@ -23,12 +23,17 @@ Route::get('/warung/{slug}', [CustomerController::class, 'showWarung'])->name('c
 */
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLogin')->name('login');
-    Route::post('/login', 'login');
+    // Semua request POST login diarahkan ke fungsi login() yang universal
+    Route::post('/login', 'login'); 
+    
     Route::get('/register', 'showRegister')->name('register');
     Route::post('/register', 'register');
     Route::post('/logout', 'logout')->name('logout');
+    
     Route::get('/customer/login', 'showCustomerLogin')->name('customer.login');
-    Route::post('/customer/login', 'customerLogin');
+    // Samakan target POST-nya agar Admin bisa login dari sini juga
+    Route::post('/customer/login', 'login'); 
+    
     Route::get('/auth/google', 'redirectGoogle')->name('google.redirect');
     Route::get('/auth/google/callback', 'handleGoogleCallback')->name('google.callback');
 });
@@ -141,3 +146,12 @@ Route::post('/orders/store', [CustomerController::class, 'store'])->name('orders
 
 // Callback Midtrans (API Route)
 Route::post('/api/midtrans/callback', [CustomerController::class, 'callback']);
+
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+    // Route yang sudah ada...
+    Route::get('/pesanan', [OwnerController::class, 'pesanan'])->name('pesanan');
+    
+    // TAMBAHKAN BARIS INI
+    Route::get('/pesanan/buat', [OwnerController::class, 'createPesanan'])->name('pesanan.create');
+    Route::post('/pesanan/simpan', [OwnerController::class, 'storePesanan'])->name('pesanan.store');
+});

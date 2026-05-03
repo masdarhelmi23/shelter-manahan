@@ -13,7 +13,7 @@
     .glass-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; animation: fadeIn 0.8s ease-out; margin-bottom: 40px; }
     
     .kartu-luxury {
-        background: rgba(255, 255, 255, 0.05); /* Sedikit lebih terang agar kontras */
+        background: rgba(255, 255, 255, 0.05); 
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -28,7 +28,7 @@
     .nilai-saldo-premium { font-size: 48px; font-weight: 900; color: #ffffff; margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; }
     .pending-status { font-size: 14px; color: #f87171; font-weight: 700; margin-bottom: 30px; display: block; }
 
-    /* Form & Input (Warna Kontras) */
+    /* Form & Input */
     .label-input { color: #ffffff; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 0.5px; }
     .input-premium { 
         width: 100%; 
@@ -40,6 +40,7 @@
         outline: none; 
         transition: 0.3s;
         font-weight: 600;
+        box-sizing: border-box;
     }
     .input-premium::placeholder { color: #64748b; font-weight: 500; }
     .input-premium:focus { border-color: #10b981; background: rgba(0, 0, 0, 0.7); }
@@ -65,9 +66,9 @@
     .sk-item { color: #e2e8f0; font-size: 14px; line-height: 1.6; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px; }
     .sk-item i { color: #38bdf8; font-size: 16px; margin-top: 3px; }
 
-    /* Riwayat Aktivitas (Warna Tajam) */
+    /* Riwayat Aktivitas */
     .section-divider { font-size: 24px; font-weight: 900; color: #ffffff; margin: 60px 0 30px 0; display: block; }
-    .table-luxury-container { background: rgba(0, 0, 0, 0.3); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); padding: 10px 35px; }
+    .table-luxury-container { background: rgba(0, 0, 0, 0.3); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); padding: 10px 35px; overflow-x: hidden; }
     .table-premium { width: 100%; border-collapse: collapse; }
     .table-premium th { text-align: left; padding: 25px 15px; color: #94a3b8; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; }
     .table-premium td { padding: 25px 15px; font-size: 14px; color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -76,11 +77,64 @@
     .text-amount { font-weight: 800; color: #ffffff; font-size: 16px; }
     .text-bank { color: #94a3b8; font-weight: 500; }
 
-    /* Badge Status Sesuai Gambar */
+    /* Badge Status */
     .status-badge { padding: 6px 16px; border-radius: 50px; font-size: 10px; font-weight: 900; text-transform: uppercase; display: inline-block; }
     .status-pending { background: rgba(252, 211, 77, 0.15); color: #fbbf24; border: 1px solid rgba(252, 211, 77, 0.3); }
     .status-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     .status-rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* =========================================
+       RESPONSIVE MOBILE OPTIMIZATION
+    ========================================= */
+    @media (max-width: 768px) {
+        .premium-title { font-size: 28px; text-align: center; }
+        .premium-subtitle { font-size: 11px; text-align: center; margin-bottom: 25px; }
+        
+        .glass-container { grid-template-columns: 1fr; gap: 20px; }
+        .kartu-luxury { padding: 25px; border-radius: 25px; }
+        .nilai-saldo-premium { font-size: 32px; }
+
+        .table-luxury-container { padding: 15px; }
+        
+        /* Hide regular table header on mobile */
+        .table-premium thead { display: none; }
+        
+        /* Table rows become cards on mobile */
+        .table-premium, .table-premium tbody, .table-premium tr, .table-premium td { 
+            display: block; 
+            width: 100%; 
+        }
+        
+        .table-premium tr { 
+            margin-bottom: 15px; 
+            background: rgba(255,255,255,0.03); 
+            border-radius: 20px; 
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .table-premium td { 
+            border: none; 
+            padding: 8px 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .table-premium td:last-child { border-bottom: none; }
+        
+        /* Add labels using data-label (optional but cleaner with pseudo) */
+        .table-premium td::before {
+            content: attr(data-label);
+            font-weight: 800;
+            color: #94a3b8;
+            font-size: 10px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+    }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -111,7 +165,7 @@
                 <input type="number" name="amount" class="input-premium" placeholder="Min. 10.000" min="10000" max="{{ $shop->balance }}" required>
             </div>
             <div style="margin-bottom: 35px;">
-                <label class="label-input">Informasi Rekening (Bank - No. Rek - Atas Nama)</label>
+                <label class="label-input">Informasi Rekening</label>
                 <textarea name="bank_info" class="input-premium" style="height: 110px; resize: none;" placeholder="Contoh: BCA - 0865654 - Masdar Helmi" required></textarea>
             </div>
             <button type="submit" class="btn-submit-premium">Konfirmasi Penarikan</button>
@@ -131,30 +185,30 @@
         </div>
         <div class="sk-item">
             <i class="fas fa-check-circle"></i>
-            <span>Pastikan data bank, nomor rekening, dan nama pemilik sudah sesuai untuk menghindari kegagalan sistem.</span>
+            <span>Pastikan data bank dan nomor rekening sudah sesuai untuk menghindari kegagalan sistem.</span>
         </div>
     </div>
 </div>
 
-<!-- Riwayat Aktivitas (Warna Lebih Kontras) -->
+<!-- Riwayat Aktivitas -->
 <span class="section-divider">Riwayat Aktivitas</span>
 <div class="table-luxury-container">
     <table class="table-premium">
         <thead>
             <tr>
-                <th style="width: 25%;">Tanggal & Waktu</th>
-                <th style="width: 20%;">Nominal</th>
-                <th style="width: 40%;">Tujuan Rekening</th>
-                <th style="width: 15%;">Status</th>
+                <th>Tanggal & Waktu</th>
+                <th>Nominal</th>
+                <th>Tujuan Rekening</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
             @forelse($withdrawals as $wd)
             <tr>
-                <td class="text-date">{{ $wd->created_at->format('d M Y, H:i') }}</td>
-                <td class="text-amount">Rp {{ number_format($wd->amount, 0, ',', '.') }}</td>
-                <td class="text-bank">{{ $wd->bank_info }}</td>
-                <td>
+                <td data-label="Waktu" class="text-date">{{ $wd->created_at->format('d M Y, H:i') }}</td>
+                <td data-label="Nominal" class="text-amount">Rp {{ number_format($wd->amount, 0, ',', '.') }}</td>
+                <td data-label="Tujuan" class="text-bank">{{ $wd->bank_info }}</td>
+                <td data-label="Status">
                     <span class="status-badge status-{{ $wd->status }}">
                         {{ $wd->status }}
                     </span>

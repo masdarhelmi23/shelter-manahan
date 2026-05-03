@@ -302,4 +302,19 @@ class OwnerController extends Controller
 
         return view('owner.withdraw', compact('shop', 'withdrawals'));
     }
+
+    public function createPesanan()
+    {
+        $shop = auth()->user()->shop;
+        
+        // Jika owner belum punya toko, arahkan balik
+        if (!$shop) {
+            return redirect()->route('owner.dashboard')->with('error', 'Aktifkan warung terlebih dahulu.');
+        }
+
+        // Ambil produk milik toko tersebut untuk dipilih di form
+        $products = $shop->products()->where('status', 'aktif')->get();
+
+        return view('owner.create_pesanan', compact('shop', 'products'));
+    }
 }

@@ -23,8 +23,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden; background: #000;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow-x: hidden; background: #000;
+            padding: 20px; /* Jarak aman untuk mobile */
         }
 
         /* BACKGROUND WITH OVERLAY */
@@ -43,7 +44,7 @@
         .login-box {
             width: 100%; max-width: 420px;
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 28px; padding: 45px 40px;
+            border-radius: 28px; padding: 40px 30px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -55,31 +56,32 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 { text-align: center; color: var(--teks-gelap); font-weight: 800; font-size: 26px; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .subtitle { text-align: center; font-size: 14px; color: var(--teks-abu); margin-bottom: 35px; }
+        h2 { text-align: center; color: var(--teks-gelap); font-weight: 800; font-size: 24px; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; font-size: 14px; color: var(--teks-abu); margin-bottom: 30px; }
 
         /* FORM STYLING */
         .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--teks-gelap); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--teks-gelap); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input {
-            width: 100%; padding: 14px 18px; border-radius: 14px;
+            width: 100%; padding: 12px 16px; border-radius: 12px;
             border: 1.5px solid #e5e7eb; outline: none; transition: var(--transition);
             background: #f9fafb; font-size: 15px;
         }
         input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); }
 
         button#btnLogin {
-            width: 100%; padding: 16px; border: none; border-radius: 14px;
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
             background: var(--teks-gelap); color: white; font-weight: 700; font-size: 15px;
             cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px;
             margin-top: 10px;
         }
         button#btnLogin:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        button#btnLogin:active { transform: translateY(0); }
         button#btnLogin:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
 
         .divider { 
-            text-align: center; margin: 25px 0; font-size: 12px; color: #9ca3af; 
+            text-align: center; margin: 25px 0; font-size: 11px; color: #9ca3af; 
             text-transform: uppercase; letter-spacing: 1.5px; position: relative;
         }
         .divider::before, .divider::after {
@@ -87,23 +89,30 @@
         }
         .divider::before { left: 0; } .divider::after { right: 0; }
 
-        /* GOOGLE BUTTON REVISI (OFFICIAL LOOK) */
         .google-btn {
             display: flex; align-items: center; justify-content: center; gap: 12px;
-            padding: 14px; border-radius: 14px; border: 1.5px solid #e5e7eb;
+            padding: 12px; border-radius: 12px; border: 1.5px solid #e5e7eb;
             text-decoration: none; color: #374151; font-weight: 700; font-size: 14px;
             background: #fff; transition: var(--transition);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .google-btn:hover { 
-            background: #fff; border-color: #d1d5db; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px);
-        }
-        .google-btn img { width: 20px; height: 20px; }
+        .google-btn:hover { background: #fdfdfd; border-color: #d1d5db; transform: translateY(-1px); }
+        .google-btn img { width: 18px; height: 18px; }
 
-        .footer { text-align: center; margin-top: 30px; font-size: 14px; color: var(--teks-abu); }
+        .footer { text-align: center; margin-top: 25px; font-size: 13px; color: var(--teks-abu); }
         .footer a { color: var(--primary); font-weight: 700; text-decoration: none; transition: 0.2s; }
-        .footer a:hover { opacity: 0.8; text-decoration: underline; }
+
+        /* RESPONSIVE MOBILE ADJUSTMENTS */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 30px 20px;
+                border-radius: 24px;
+            }
+            h2 { font-size: 22px; }
+            .subtitle { font-size: 13px; }
+            input { font-size: 14px; padding: 11px 14px; }
+            button#btnLogin { font-size: 14px; }
+        }
     </style>
 </head>
 
@@ -117,7 +126,7 @@
         @csrf
         <div class="form-group">
             <label>Email atau Username</label>
-            <input type="text" name="login" id="login" placeholder="Masukkan email/username" required>
+            <input type="text" name="login" id="login" placeholder="Email atau username" required>
         </div>
 
         <div class="form-group">
@@ -133,7 +142,7 @@
     <div class="divider">Atau</div>
 
     <a href="{{ url('/auth/google') }}" class="google-btn">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width:20px; height:20px;">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
         Masuk dengan Google
     </a>
 
@@ -144,6 +153,19 @@
 </div>
 
 <script>
+    // Inisialisasi Toast SweetAlert2
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -158,36 +180,38 @@
         fetch("{{ url('/login') }}", {
             method: "POST",
             headers: {
+                "X-Requested-With": "XMLHttpRequest", 
                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 "Accept": "application/json"
             },
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json().then(data => ({ status: response.status, body: data }));
+            } else {
+                throw new Error("Sesi berakhir atau terjadi kesalahan server.");
+            }
+        })
+        .then(({ status, body }) => {
+            if (body.success) {
+                Toast.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true,
-                    background: '#fff',
-                    color: '#111'
+                    text: body.message
                 }).then(() => {
-                    window.location.href = data.redirect;
+                    window.location.href = body.redirect;
                 });
             } else {
-                throw new Error(data.message);
+                throw new Error(body.message || 'Kredensial tidak valid.');
             }
         })
         .catch(error => {
-            Swal.fire({
+            Toast.fire({
                 icon: 'error',
                 title: 'Login Gagal',
-                text: error.message || 'Kredensial tidak valid.',
-                confirmButtonColor: '#111827'
+                text: error.message
             });
             btn.disabled = false;
             btnText.innerText = 'Masuk Sekarang';

@@ -16,15 +16,15 @@ class CustomerController extends Controller
     public function index() { return view('customer.home'); }
     public function profile() { return view('customer.profile'); }
 
-    public function showWarung($slug)
+    public function showWarung($id) 
     {
-        $shop = Shop::where('slug', $slug)->where('status', 'active')->firstOrFail();
-        $products = $shop->products()->where('status', 'aktif')->latest()->get();
-        
-        // Data keranjang untuk navbar
-        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-        
-        return view('customer.warung', compact('shop', 'products', 'cartItems'));
+        $shop = Shop::where('id', $id)
+                    ->where('status', 'active')
+                    ->firstOrFail();
+
+        $products = $shop->products()->where('status', 'aktif')->get();
+
+        return view('customer.warung', compact('shop', 'products'));
     }
 
     /**

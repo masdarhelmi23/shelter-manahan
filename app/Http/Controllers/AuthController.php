@@ -24,60 +24,63 @@ class AuthController extends Controller
     // Proses Login Utama (Email/Username + AJAX Support)
     public function login(Request $request)
     {
-        // 1. Validasi Input
-        $request->validate([
-            'login' => 'required|string',
-            'password' => 'required',
-        ]);
+        // Gunakan try-catch agar jika ada error server, tetap kembali sebagai JSON
+        try {
+            $request->validate([
+                'login' => 'required|string',
+                'password' => 'required',
+            ]);
 
-        // 2. Cek apakah login menggunakan Email atau Username
-        $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+            $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+            $credentials = [
+                $loginType => $request->login,
+                'password' => $request->password,
+            ];
 
-        $credentials = [
-            $loginType => $request->login,
-            'password' => $request->password,
-        ];
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+                $user = Auth::user();
+                
+                if ($user->role === 'admin') {
+                    $defaultUrl = route('admin.dashboard');
+                } elseif ($user->role === 'owner') {
+                    $defaultUrl = route('owner.dashboard');
+                } else {
+                    $defaultUrl = route('customer.home');
+                }
 
-        // 3. Proses Attempt Login
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            
-            // Logika Redirect Berdasarkan Role
-            if ($user->role === 'admin') {
-                $redirectUrl = route('admin.dashboard');
-            } elseif ($user->role === 'owner') {
-                $redirectUrl = route('owner.dashboard');
-            } else {
-                // Untuk Customer: Ambil halaman terakhir (intended), default ke welcome
-                $redirectUrl = session()->pull('url.intended', route('welcome'));
+                $redirectUrl = session()->get('url.intended', $defaultUrl);
+
+                // Memastikan selalu mengirim JSON jika dipanggil via fetch/ajax
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Selamat datang kembali, ' . $user->name,
+                        'redirect' => $redirectUrl
+                    ]);
+                }
+
+                return redirect()->intended($defaultUrl);
             }
 
-            // RESPON UNTUK AJAX (SweetAlert)
-            if ($request->ajax()) {
+            // Respon jika kredensial salah
+            if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Selamat datang kembali, ' . $user->name,
-                    'redirect' => $redirectUrl
-                ]);
+                    'success' => false,
+                    'message' => 'Username/Email atau Password salah.'
+                ], 401);
             }
 
-            return redirect()->intended($redirectUrl);
-        }
+            return back()->withErrors(['login' => 'Kredensial tidak cocok.']);
 
-        // 4. JIKA GAGAL
-        if ($request->ajax()) {
+        } catch (\Exception $e) {
+            // Jika ada error koding/database, kirim pesan error sebagai JSON (bukan HTML)
             return response()->json([
                 'success' => false,
-                'message' => 'Kredensial yang diberikan tidak cocok dengan data kami.'
-            ], 401);
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
         }
-
-        return back()->withErrors([
-            'login' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
-        ])->onlyInput('login');
     }
-
     // Proses logout: REVISI REDIRECT KE WELCOME
     public function logout(Request $request)
     {

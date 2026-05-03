@@ -591,9 +591,7 @@ td{
         </span>
     </div>
 
-    <div style="font-weight:800; color:#0284c7; letter-spacing:1px;">
-        SHELTER MANAHAN SYSTEM v2.0
-    </div>
+   
 
 </div>
 
