@@ -112,24 +112,32 @@ class OwnerController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validasi data
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'status' => 'required|in:aktif,tidak aktif',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'harga'       => 'required|numeric',
+            'foto'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // Kita hapus validasi 'status' dari sini jika ingin otomatis 'aktif'
         ]);
+
         $shop = Auth::user()->shop;
         if (!$shop) return back()->with('error', 'Toko tidak ditemukan!');
 
-        $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('produk', 'public') : null;
+        // 2. Handle Upload Foto
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('produk', 'public');
+        }
 
+        // 3. Simpan ke Database
         Product::create([
-            'shop_id' => $shop->id,
+            'shop_id'     => $shop->id,
             'nama_produk' => $request->nama_produk,
-            'harga' => $request->harga,
-            'status' => $request->status,
-            'foto' => $fotoPath,
+            'harga'       => $request->harga,
+            'status'      => 'aktif', // Kita set otomatis 'aktif' agar tidak error
+            'foto'        => $fotoPath,
         ]);
+
         return redirect()->route('owner.produk')->with('success', 'Produk berhasil masuk katalog!');
     }
 
