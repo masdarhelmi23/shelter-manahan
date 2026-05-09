@@ -109,7 +109,7 @@
         @csrf
         <div class="form-group">
             <label>Nama Lengkap</label>
-            <input type="text" name="name" placeholder="Contoh: Masdar Helmi" required>
+            <input type="text" name="name" placeholder="Contoh: Fathin" required>
         </div>
 
         <div class="form-group">

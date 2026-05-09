@@ -10,10 +10,27 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str; // Tambahkan ini
 
 class CustomerController extends Controller
 {
-    public function index() { return view('customer.home'); }
+    public function index()
+    {
+        $groupedOrders = collect(); 
+
+        if (Auth::check()) {
+            $groupedOrders = Order::with(['details.product', 'shop'])
+                ->where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->take(5) 
+                ->get();
+        }
+
+        $shops = \App\Models\Shop::where('status', 'active')->get();
+
+        return view('welcome', compact('groupedOrders', 'shops'));
+    }
+
     public function profile() { return view('customer.profile'); }
 
     public function showWarung($id) 
@@ -27,26 +44,16 @@ class CustomerController extends Controller
         return view('customer.warung', compact('shop', 'products'));
     }
 
-    /**
-     * Menangani Halaman Checkout Pesanan
-     * Perbaikan: Mengganti $invoice_id menjadi $order->order_id 
-     * dan $grand_total menjadi $order->amount
-     */
     public function orderCheckout($id)
     {
-        // 1. Cari data pesanan berdasarkan Invoice atau ID
         $order = Order::where('order_id', $id)
                     ->orWhere('id', $id)
                     ->with('details.product')
                     ->firstOrFail();
 
-        // 2. Ambil data keranjang (untuk Navbar)
         $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-
-        // 3. Definisikan variabel $total agar tidak error di view
         $total = $order->amount;
 
-        // 4. Logika Midtrans SNAP
         if (!$order->snap_token && $order->payment_method === 'midtrans') {
             \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
             \Midtrans\Config::$isProduction = false;
@@ -55,14 +62,13 @@ class CustomerController extends Controller
 
             $params = [
                 'transaction_details' => [
-                    'order_id' => $order->order_id, // FIX: Ambil dari objek $order
-                    'gross_amount' => (int) $order->amount, // FIX: Ambil dari objek $order
+                    'order_id' => $order->order_id,
+                    'gross_amount' => (int) $order->amount,
                 ],
                 'customer_details' => [
                     'first_name' => $order->customer_name,
                     'phone' => $order->customer_whatsapp,
                 ],
-                // Tetap menggunakan Dynamic Callback agar lancar di 2 Ngrok berbeda
                 'callbacks' => [
                     'finish' => env('APP_URL') . '/orders', 
                     'notification' => env('APP_URL') . '/api/midtrans/callback', 
@@ -73,7 +79,6 @@ class CustomerController extends Controller
             $order->save();
         }
 
-        // 5. Kirim semua variabel yang dibutuhkan view
         return view('customer.checkout', [
             'order' => $order,
             'snapToken' => $order->snap_token,
@@ -96,10 +101,17 @@ class CustomerController extends Controller
                 $subtotal = 0;
                 $admin_fee = ($request->payment_method === 'midtrans') ? 2500 : 0;
                 $orderItemsData = [];
+                $target_shop_id = null; // Variabel penampung ID Warung
 
                 foreach ($request->items as $id => $item) {
                     if ($item['qty'] > 0) {
                         $product = Product::findOrFail($id);
+                        
+                        // AMBIL SHOP_ID dari produk pertama yang ditemukan
+                        if (!$target_shop_id) {
+                            $target_shop_id = $product->shop_id;
+                        }
+
                         $line_total = $product->harga * $item['qty'];
                         $subtotal += $line_total;
                         $orderItemsData[] = [
@@ -112,10 +124,12 @@ class CustomerController extends Controller
                 }
 
                 $grand_total = $subtotal + $admin_fee;
-                $invoice_id = 'MOTO-' . strtoupper(uniqid()); // Menggunakan prefix untuk keamanan multi-project
+                $invoice_id = 'MOTO-' . strtoupper(Str::random(10)); 
 
+                // PERBAIKAN: Masukkan shop_id ke sini
                 $order = Order::create([
                     'user_id' => Auth::id(),
+                    'shop_id' => $target_shop_id, // SEKARANG SUDAH ADA ISI-NYA
                     'order_id' => $invoice_id,
                     'customer_name' => $request->customer_name,
                     'customer_whatsapp' => $request->customer_whatsapp,
@@ -135,7 +149,6 @@ class CustomerController extends Controller
                     ]);
                 }
 
-                // Opsional: Langsung buat snap_token jika user memilih midtrans
                 if ($request->payment_method === 'midtrans') {
                     \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
                     \Midtrans\Config::$isProduction = false;
@@ -175,7 +188,7 @@ class CustomerController extends Controller
     public function orders()
     {
         $groupedOrders = Order::where('user_id', Auth::id())
-                        ->with('details.product') 
+                        ->with(['details.product', 'shop']) // Tambahkan .shop di sini agar riwayat tidak error
                         ->latest()
                         ->get();
         
@@ -210,9 +223,6 @@ class CustomerController extends Controller
         return back();
     }
 
-    /**
-     * Webhook Callback dari Midtrans
-     */
     public function callback(Request $request)
     {
         $serverKey = config('midtrans.server_key');
@@ -220,28 +230,16 @@ class CustomerController extends Controller
 
         if ($hashed == $request->signature_key) {
             if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                
-                // Cari order berdasarkan order_id dari Midtrans
                 $order = Order::where('order_id', $request->order_id)->first();
 
-                // Pastikan order ditemukan dan statusnya masih pending sebelum diupdate
                 if ($order && $order->status == 'pending') {
-                    
-                    // 1. Update status pesanan menjadi settlement (LUNAS)
                     $order->update(['status' => 'settlement']);
 
-                    // 2. Loop semua detail pesanan untuk menambah saldo ke masing-masing toko
-                    // Ini penting jika dalam satu invoice ada lebih dari satu toko
                     foreach ($order->details as $detail) {
                         $product = $detail->product;
                         if ($product && $product->shop) {
-                            // Ambil toko pemilik produk
                             $shop = $product->shop;
-                            
-                            // Hitung total harga produk ini (qty x harga)
                             $subtotal = $detail->qty * $detail->price;
-
-                            // Tambahkan ke saldo toko tersebut
                             $shop->increment('balance', $subtotal);
                         }
                     }

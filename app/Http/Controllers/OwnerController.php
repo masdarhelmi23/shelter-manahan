@@ -243,14 +243,39 @@ class OwnerController extends Controller
 
     public function storePesanan(Request $request)
     {
-        $request->validate(['customer_name' => 'required|string', 'customer_whatsapp' => 'required', 'payment_method' => 'required', 'amount' => 'required|numeric', 'status' => 'required', 'items' => 'required|array']);
-        $order = Order::create(['order_id' => 'MOTO-' . strtoupper(Str::random(10)), 'customer_name' => $request->customer_name, 'customer_whatsapp' => $request->customer_whatsapp, 'payment_method' => $request->payment_method, 'amount' => $request->amount, 'status' => $request->status, 'user_id' => Auth::id()]);
+        $request->validate([
+            'customer_name' => 'required|string',
+            'customer_whatsapp' => 'required',
+            'payment_method' => 'required',
+            'amount' => 'required|numeric',
+            'status' => 'required',
+            'items' => 'required|array'
+        ]);
+
+        $order = Order::create([
+            'order_id' => 'MOTO-' . strtoupper(Str::random(10)),
+            'customer_name' => $request->customer_name,
+            'customer_whatsapp' => $request->customer_whatsapp,
+            'payment_method' => $request->payment_method,
+            'amount' => $request->amount,
+            'status' => $request->status,
+            'user_id' => Auth::id()
+        ]);
+
         foreach ($request->items as $item) {
             if (isset($item['product_id']) && $item['qty'] > 0) {
                 $product = Product::find($item['product_id']);
-                OrderDetail::create(['order_id' => $order->id, 'product_id' => $item['product_id'], 'qty' => $item['qty'], 'subtotal' => $product->harga * $item['qty']]);
+                
+                OrderDetail::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $item['product_id'],
+                    'qty'        => $item['qty'],
+                    'price'      => $product->harga, 
+                    'subtotal'   => $product->harga * $item['qty']
+                ]);
             }
         }
+
         return redirect()->back()->with('success', 'Pesanan manual berhasil dibuat!');
     }
 

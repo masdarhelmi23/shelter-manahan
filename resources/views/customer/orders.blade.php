@@ -38,10 +38,11 @@
         text-align: left; padding: 15px; color: #94a3b8; font-size: 11px; 
         text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid #f1f5f9; 
     }
-    .orders-table td { padding: 20px 15px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .orders-table td { padding: 20px 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
 
     /* INFO STYLING */
     .order-id { font-size: 15px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+    .shop-name { font-weight: 800; color: #0284c7; font-size: 14px; text-transform: uppercase; }
     .price-main { font-weight: 900; color: #16a34a; font-size: 17px; display: block; }
 
     /* STATUS BADGES */
@@ -61,7 +62,7 @@
     .btn-detail:hover { background: #0284c7; transform: translateY(-2px); }
 
     /* =========================================
-        MOBILE RESPONSIVE REVISION (RATA KANAN)
+        MOBILE RESPONSIVE REVISION
     ========================================= */
     @media (max-width: 992px) {
         .orders-table thead { display: none; }
@@ -75,20 +76,7 @@
         .orders-table td { 
             border-bottom: none; padding: 10px 0; display: flex; 
             justify-content: space-between; align-items: center; 
-            text-align: right; /* Pastikan konten rata kanan */
-        }
-
-        /* Khusus kolom pelanggan agar Nama & WA tetap satu kolom di kanan */
-        .orders-table td[data-label="Pelanggan"] {
-            align-items: flex-start;
-            flex-direction: row; /* Tetap sebaris dengan label di kiri */
-        }
-
-        .customer-info-mobile {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end; /* Paksa info pelanggan ke kanan */
-            width: 100%;
+            text-align: right;
         }
 
         .orders-table td::before {
@@ -98,7 +86,6 @@
             margin-right: 15px;
         }
 
-        /* Bungkus data agar selalu berada di kanan */
         .mobile-data-wrapper {
             flex: 2;
             display: flex;
@@ -110,9 +97,7 @@
         .orders-glass-card { padding: 15px; border-radius: 25px; }
     }
 
-    /* =========================================
-        FIXED POPUP NOTA
-    ========================================= */
+    /* POPUP NOTA */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
@@ -153,8 +138,8 @@
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th>Invoice</th>
-                        <th>Informasi Pelanggan</th>
+                        <th>Invoice & Toko</th>
+                        <th>Pelanggan</th>
                         <th style="text-align: center;">Status</th>
                         <th>Total Bayar</th>
                         <th style="text-align: center;">Aksi</th>
@@ -166,19 +151,21 @@
                             <td data-label="Invoice">
                                 <div class="mobile-data-wrapper">
                                     <div class="order-id">#{{ $order->order_id }}</div>
-                                    <div style="font-size: 11px; color: #94a3b8;">{{ $order->created_at->format('d M Y, H:i') }} WIB</div>
+                                    <!-- MENAMPILKAN NAMA WARUNG -->
+                                    <div class="shop-name"><i class="fa-solid fa-store"></i> {{ $order->shop->name ?? 'Warung Shelter' }}</div>
+                                    <div style="font-size: 11px; color: #94a3b8; margin-top: 5px;">{{ $order->created_at->format('d M Y, H:i') }} WIB</div>
                                 </div>
                             </td>
                             <td data-label="Pelanggan">
-                                <div class="customer-info-mobile">
+                                <div class="mobile-data-wrapper">
                                     <div style="font-weight: 800; color: #0f172a; font-size: 15px;">{{ $order->customer_name ?? auth()->user()->name }}</div>
-                                    <div style="font-size: 12px; color: #16a34a; font-weight: 700; margin-top: 2px;">
+                                    <div style="font-size: 12px; color: #16a34a; font-weight: 700;">
                                         <i class="fa-brands fa-whatsapp"></i> {{ $order->customer_whatsapp ?? '-' }}
                                     </div>
                                 </div>
                             </td>
                             <td data-label="Status">
-                                <div class="mobile-data-wrapper">
+                                <div class="mobile-data-wrapper" style="align-items: center;">
                                     @if($order->status == 'pending')
                                         <span class="status-badge status-pending">BELUM BAYAR</span>
                                     @else
@@ -192,7 +179,7 @@
                                 </div>
                             </td>
                             <td data-label="Aksi">
-                                <button class="btn-detail" onclick="openNota('{{ $order->order_id }}', '{{ $order->status }}', '{{ $order->payment_method }}', '{{ $order->amount }}', '{{ $order->customer_name }}', '{{ $order->customer_whatsapp }}', {{ json_encode($order->details) }})">
+                                <button class="btn-detail" onclick="openNota('{{ $order->order_id }}', '{{ $order->status }}', '{{ $order->payment_method }}', '{{ $order->amount }}', '{{ $order->customer_name }}', '{{ $order->customer_whatsapp }}', {{ json_encode($order->details) }}, '{{ $order->shop->name ?? 'Warung Shelter' }}')">
                                     <i class="fa-solid fa-file-invoice"></i> Lihat Nota
                                 </button>
                             </td>
@@ -213,6 +200,8 @@
 <div class="modal-overlay" id="modalNota" onclick="closeNota(event)">
     <div class="nota-box" onclick="event.stopPropagation()">
         <div class="nota-header">
+            <!-- NAMA TOKO DI HEADER NOTA -->
+            <div id="notaShopName" style="font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #fcd34d; margin-bottom: 5px;">NAMA WARUNG</div>
             <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7;">Struk Pembayaran</div>
             <h2 id="notaId" style="font-weight: 900; margin-top: 5px;">#ORDER-ID</h2>
             <i id="notaIcon" class="fa-solid fa-circle-check" style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 40px; color: #fff; background: #16a34a; border-radius: 50%; border: 5px solid #fff;"></i>
@@ -244,8 +233,9 @@
 </div>
 
 <script>
-    function openNota(id, status, method, amount, name, wa, details) {
+    function openNota(id, status, method, amount, name, wa, details, shopName) {
         document.getElementById('notaId').innerText = '#' + id;
+        document.getElementById('notaShopName').innerText = shopName; // Set Nama Warung
         document.getElementById('notaCustName').innerText = name || '{{ auth()->user()->name }}';
         document.getElementById('notaCustWA').innerText = wa || '-';
         document.getElementById('notaMethod').innerText = (method === 'midtrans') ? 'Transfer Virtual Account' : 'Tunai di Kasir';

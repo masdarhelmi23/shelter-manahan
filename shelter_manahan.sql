@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 02, 2026 at 05:50 PM
+-- Generation Time: May 03, 2026 at 12:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.4.20
 
@@ -148,7 +148,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (18, '2026_05_02_172914_add_closed_until_to_shops_table', 15),
 (19, '2026_05_02_203809_add_balance_to_shops_table', 16),
 (20, '2026_05_02_212335_create_withdrawals_table', 17),
-(21, '2026_05_02_213054_create_withdrawals_table', 18);
+(21, '2026_05_02_213054_create_withdrawals_table', 18),
+(22, '2026_05_03_155618_di_tabel_shops_hapus_slug', 19);
 
 -- --------------------------------------------------------
 
@@ -177,7 +178,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `product_id`, `order_id`, `customer_name`, `customer_whatsapp`, `payment_method`, `admin_fee`, `amount`, `status`, `snap_token`, `created_at`, `updated_at`) VALUES
-(49, 18, NULL, 'MOTO-69F6069F20166', 'ALDO', '08564121', 'cashier', 0, 20000, 'pending', NULL, '2026-05-02 14:13:51', '2026-05-02 14:13:51');
+(49, 18, NULL, 'MOTO-69F6069F20166', 'ALDO', '08564121', 'cashier', 0, 20000, 'pending', NULL, '2026-05-02 14:13:51', '2026-05-02 14:13:51'),
+(50, 18, NULL, 'MOTO-69F7104039045', 'adddi', '0854654', 'midtrans', 2500, 72500, 'settlement', '1a00ce38-0e71-4f60-8aaa-e9b3d625ea2a', '2026-05-03 09:07:12', '2026-05-03 09:08:13');
 
 -- --------------------------------------------------------
 
@@ -201,7 +203,9 @@ CREATE TABLE `order_details` (
 --
 
 INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `qty`, `price`, `subtotal`, `created_at`, `updated_at`) VALUES
-(43, 49, 9, 1, 20000, 20000, '2026-05-02 14:13:51', '2026-05-02 14:13:51');
+(43, 49, 9, 1, 20000, 20000, '2026-05-02 14:13:51', '2026-05-02 14:13:51'),
+(44, 50, 9, 2, 20000, 40000, '2026-05-03 09:07:12', '2026-05-03 09:07:12'),
+(45, 50, 10, 2, 15000, 30000, '2026-05-03 09:07:12', '2026-05-03 09:07:12');
 
 -- --------------------------------------------------------
 
@@ -262,18 +266,10 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('406xoUv4BjP3o5i4vY07X1UCWlQreFG5PiJlFRko', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJVSWVkM2ZnV2Y1bUExT2hqTE9xQmhIb2tBaEFsUVNES2FFOVZNSzRkIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730953),
-('Eq1iQDFW7ieTEHkBFOCyI7CA8iGelU18p15h1HTq', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJKOVdKZkFtNHVPU0ttVE5VRTVkanFCNlNGYUdiZkN1TERBSFdZWGk4IiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730363),
-('fqng1eHLd1fMzojqphi76MMEPAhBSkz7GJRUPguv', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJoU2lDMnRNUGUxbnlXeG5jM0tIMWJ3UHFmRURNak5rYnBqOXhkSFQ0IiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2FkbWluXC93aXRoZHJhd2FscyIsInJvdXRlIjoiYWRtaW4ud2l0aGRyYXdhbHMifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjF9', 1777736866),
-('HPZVJkbZICALCErD3ft2KXLEiifKD80YNX9bXJ0c', 13, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0', 'eyJfdG9rZW4iOiJiZWJnMTJNVXh5ZFVjWXlvOUI4MUg1S3l5T3psZVRPZml4cnN5RndwIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL293bmVyXC93aXRoZHJhdyIsInJvdXRlIjoib3duZXIud2l0aGRyYXcuaW5kZXgifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEzfQ==', 1777736733),
-('NWUnousUrNb15grPnvhGZSekzS27wzS0OcxjRf2C', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJDY2hxME5HVDJqUlkxUm4xS3o4emZZWWFBWnY3bXhjV29XZEVBdFIwIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730631),
-('o7bm9wWxdKPXSEU7VgpZ2DP54bkU72aVm8iTeU0k', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJ5WWRTVDc1M1FCTVlNVTVPdkNjczNPblcwekl5bGp0OUtzaDBQRXFXIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777731191),
-('PeKC1iis9x8ULB3jASMmSNTvEgzjexolwjmowgDI', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJBcUVvNU5DUHpjV0Z1S243RnpwZVBQZGoyM1Y4R3ZDeDdPWXZJc3dlIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730721),
-('qChC5zy0tccUuRQAfXeuMxkuwejE3hKqylPZDRkb', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiI3dm5CbUlqWk1QTU5hclRSWlpLNm1VdGJuWXZzdDVlUEhicFVCNFBqIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730711),
-('WYllEUcK0cRoeJmPoydZBrTnTp9PJKtSfvJTyk7A', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiI3em9KQzVkaWNkRjVwWWJzUDB0dVBtMEJBVzd6TEhPTTZqZGNHaUJFIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730230),
-('xIz2TYuwrcxTon2bbsMP1p3PK2pxG7QDY967MRv2', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJ5ZDloVjdrUnhINXNkaEY0anVYeXAyZTVzSXlhSFNvWjFxT09sVEx2IiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730622),
-('XKDHnOSQ1AgwKOZ125H0OmgoJuVb5a5r6QE5HOQ9', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJMYmplbW5jVTNaT2hJVjlnR3JPSk9Idk9GNmlJVXZjb094dk51YUMzIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730944),
-('zXo2LQm50xie3kniFgWZiuEbW58s4qWJ4cvRDYZd', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiJsV0kyTUtEUURsTVVtWFQyR2pDdnBFRHIyeldzdkd2OWxjY1JZMnIyIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777730372);
+('3DgkswXRofCYXF8bdF93hN5Wbedq6PD6BiutYBKV', 13, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJQQmlNOFpqY3hMSzA5b1dYTVp6a3VOa3ZJQVhZWlZSRzRoNmY4Y0owIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL293bmVyXC9wZW5nYXR1cmFuIiwicm91dGUiOiJvd25lci5wZW5nYXR1cmFuIn0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjoxM30=', 1777802080),
+('KWGUXLxOeaZgTwNWukcWSBTSlAwKme9xoDsSWVXu', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiIzNnNKMk5UMEdtQkFQRFBHODZwYVVUTGhxOER5cVZVVWpFak5LNzRwIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777799277),
+('UYpzRWDpDHc225cK08BYaGHvIkbWds0XwijgSZta', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0', 'eyJfdG9rZW4iOiJNWFNYdGdhdTNhWDdXUEFDUTJ6Z253ckZ6dXkybWI3T0VPSU5nYVNrIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2FkbWluXC91c2VycyIsInJvdXRlIjoiYWRtaW4udXNlcnMifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjF9', 1777798339),
+('WGrnfvjYZTZCxTXQcQanlQHOqngfPsWxitA3ekwj', NULL, '127.0.0.1', 'Veritrans', 'eyJfdG9rZW4iOiIyS0NhczNTbGFBU25mZWxBSHlQY2lnM0VtQ0JHWVRSRnlkQnJXTElrIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1777799293);
 
 -- --------------------------------------------------------
 
@@ -285,7 +281,6 @@ CREATE TABLE `shops` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
-  `slug` varchar(255) DEFAULT NULL,
   `logo` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
@@ -305,11 +300,13 @@ CREATE TABLE `shops` (
 -- Dumping data for table `shops`
 --
 
-INSERT INTO `shops` (`id`, `user_id`, `name`, `slug`, `logo`, `description`, `image`, `status`, `balance`, `whatsapp`, `instagram`, `open_time`, `close_time`, `is_active`, `closed_until`, `created_at`, `updated_at`) VALUES
-(4, 12, 'gondong warungku', 'gondong-warungku', 'logos/4pDInnhGIpkER3CLJzNK207tcfCcJZmjq0R4eCr5.jpg', NULL, NULL, 'active', 0.00, '6285870536367', 'msdrhlmi_', NULL, NULL, 1, NULL, '2026-04-20 09:37:30', '2026-04-20 09:49:23'),
-(5, 13, 'Shelter 2 \"pak gendut\"', 'shelter-2-pak-gendut', 'logos/SVFcLF6KmHI8qu5l0IA1y0T8aNmMmJrzkAzxRXeV.png', NULL, NULL, 'active', 100000.00, '62857263113000', 'fathinnryfsa', '09:30:00', '23:59:00', 1, NULL, '2026-04-20 09:52:11', '2026-05-02 15:39:16'),
-(7, 15, 'shelter 2', 'shelter-2', 'logos/N1wkWCng1B3ytzCVbPrDyJfz2kYFf9ov3ZutoosV.jpg', NULL, NULL, 'active', 0.00, '6285870536367', 'msdrhlmi_', NULL, NULL, 1, NULL, '2026-04-21 18:32:27', '2026-04-21 18:32:27'),
-(8, 16, 'shelter 12', NULL, 'logos/Ym3PZk0IrJfjljvVQrJ28BQ26ONPiy8fVQXM3DvQ.jpg', NULL, NULL, 'pending', 0.00, '2341', 'fathinnryfsa', '20:04:00', '20:06:00', 1, NULL, '2026-04-22 01:12:44', '2026-05-02 15:29:46');
+INSERT INTO `shops` (`id`, `user_id`, `name`, `logo`, `description`, `image`, `status`, `balance`, `whatsapp`, `instagram`, `open_time`, `close_time`, `is_active`, `closed_until`, `created_at`, `updated_at`) VALUES
+(4, 12, 'gondong warungku', 'logos/4pDInnhGIpkER3CLJzNK207tcfCcJZmjq0R4eCr5.jpg', NULL, NULL, 'active', 0.00, '6285870536367', 'msdrhlmi_', NULL, NULL, 1, NULL, '2026-04-20 09:37:30', '2026-04-20 09:49:23'),
+(5, 13, 'Shelter 2 \"pak gendut\"', 'logos/SVFcLF6KmHI8qu5l0IA1y0T8aNmMmJrzkAzxRXeV.png', NULL, NULL, 'active', 170000.00, '62857263113000', 'fathinnryfsa', '09:30:00', '23:59:00', 1, NULL, '2026-04-20 09:52:11', '2026-05-03 09:08:13'),
+(7, 15, 'shelter 2', 'logos/N1wkWCng1B3ytzCVbPrDyJfz2kYFf9ov3ZutoosV.jpg', NULL, NULL, 'active', 0.00, '6285870536367', 'msdrhlmi_', NULL, NULL, 1, NULL, '2026-04-21 18:32:27', '2026-04-21 18:32:27'),
+(8, 16, 'shelter 12', 'logos/Ym3PZk0IrJfjljvVQrJ28BQ26ONPiy8fVQXM3DvQ.jpg', NULL, NULL, 'pending', 0.00, '2341', 'fathinnryfsa', '20:04:00', '20:06:00', 1, NULL, '2026-04-22 01:12:44', '2026-05-02 15:29:46'),
+(9, 19, 'Shelter 2 \"agus\"', NULL, NULL, NULL, 'active', 0.00, NULL, NULL, '08:00:00', '22:00:00', 1, NULL, '2026-05-03 08:16:20', '2026-05-03 08:16:20'),
+(12, 22, 'Shelter 30 \'Warmindo 88\'', 'logos/qmnhcTOnPdkUIQlC8uOYTdFoYL0RPdhNfteZjldJ.png', NULL, NULL, 'active', 0.00, '62857263113000', 'msdrhlmi_', '08:00:00', '22:00:00', 1, NULL, '2026-05-03 08:53:27', '2026-05-03 08:53:27');
 
 -- --------------------------------------------------------
 
@@ -340,7 +337,9 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `ro
 (15, 'shelter 2', 'tomi@gmail.com', NULL, '$2y$12$eXc2Fydx.bQr98sFdfbSJOdRuPrrMJrXwe.F9qY2AtxXqb1s0XHIy', 'owner', NULL, '2026-04-21 18:30:57', '2026-04-21 18:30:57'),
 (16, 'aldo', 'aldo@gmail.com', NULL, '$2y$12$VLSL0ilUXoAOyf297FNO/OykjzUE0Vwyhu.uGP1HT/T9omUipGh/C', 'owner', NULL, '2026-04-22 01:11:21', '2026-04-22 01:11:21'),
 (17, 'Masdar Helmi', 'masdarhelmi23@gmail.com', NULL, '$2y$12$j35ivsraFdZZooa2oylOfOoiJZ9NmIK3jdGH2fmogyTyeV7yQbCLK', 'customer', NULL, '2026-04-22 05:12:39', '2026-04-27 19:22:56'),
-(18, 'helmi', 'masdarhelmi2301@gmail.com', NULL, '$2y$12$vvZutpzSMDh33JhIVTEqDeur1TOvnJdHmZPo0lOqhykPNmDGX6jsi', 'customer', NULL, '2026-04-22 11:08:22', '2026-05-02 13:56:36');
+(18, 'helmi', 'masdarhelmi2301@gmail.com', NULL, '$2y$12$qT6GA2HwZbUi/cEH5vydYePrqev4Ehel2EKiyzFrbZ8BR1m0xn75K', 'customer', NULL, '2026-04-22 11:08:22', '2026-05-03 09:06:48'),
+(19, 'hp dect', 'dect@gmail.com', NULL, '$2y$12$44CGMmFJ27y1EKl/8LwGX.RVR90tZ0AjIg1CoS1zzExxxAGjbOKtG', 'owner', NULL, '2026-05-03 08:15:08', '2026-05-03 08:15:08'),
+(22, 'anda', 'anda@gmail.com', NULL, '$2y$12$f2cq4nBmFJLNyPhYOZJ6/uur1rFdw6FvfVRPCvLDZCtC1xozo8o9u', 'owner', NULL, '2026-05-03 08:52:18', '2026-05-03 08:52:18');
 
 -- --------------------------------------------------------
 
@@ -505,19 +504,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -529,13 +528,13 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `shops`
 --
 ALTER TABLE `shops`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `withdrawals`

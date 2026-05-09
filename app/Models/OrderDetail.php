@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     protected $fillable = [
-        'order_id',   // Connect ke ID di tabel orders
-        'product_id', // Barang yang dibeli
-        'qty',        // Jumlah (PCS/Porsi)
-        'price',      // Harga satuan saat dibeli
-        'subtotal'    // qty * price
+        'order_id',   
+        'product_id', 
+        'qty',      
+        'price',      
+        'subtotal'    
     ];
 
     // Relasi balik ke Order

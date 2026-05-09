@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Library FontAwesome & SweetAlert2 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     /* TYPOGRAPHY & LAYOUT */
@@ -28,17 +30,31 @@
     .status-lunas { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
     .status-error { background: rgba(220, 38, 38, 0.2); color: #f87171; }
     
-    .btn-aksi { padding: 10px 15px; border-radius: 12px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; color: #fff; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .btn-aksi { padding: 10px 15px; border-radius: 12px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; color: #fff; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border: 1px solid transparent; }
+    .btn-aksi:hover { transform: translateY(-3px); }
+    
     .btn-tambah { background: #0284c7; box-shadow: 0 10px 20px rgba(2, 132, 199, 0.3); font-size: 14px; padding: 15px 25px; }
     .btn-update { background: #16a34a; }
     .btn-hapus { background: #dc2626; }
+
+    /* CUSTOM SWEETALERT UI */
+    .swal2-popup.swal-custom {
+        background: rgba(15, 23, 42, 0.9) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 25px !important;
+        color: #fff !important;
+    }
+    .swal2-title { color: #fff !important; }
+    .swal2-html-container { color: #cbd5e1 !important; }
+    .swal2-confirm { border-radius: 12px !important; padding: 12px 25px !important; font-weight: 700 !important; }
+    .swal2-cancel { border-radius: 12px !important; padding: 12px 25px !important; font-weight: 700 !important; }
 
     /* ================= RESPONSIVE MOBILE REVISION ================= */
     @media (max-width: 768px) {
         .header-aksi { flex-direction: column; align-items: center; text-align: center; }
         .btn-tambah { width: 100%; justify-content: center; }
 
-        /* Transform Tabel ke Kartu */
         .tabel-pesanan thead { display: none; }
         .tabel-pesanan, .tabel-pesanan tbody, .tabel-pesanan tr, .tabel-pesanan td { display: block; width: 100%; }
         .tabel-pesanan tr { margin-bottom: 20px; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -47,6 +63,7 @@
             padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: right;
         }
         .tabel-pesanan td::before { content: attr(data-label); font-weight: 800; color: #fcd34d; font-size: 10px; text-align: left; text-transform: uppercase; }
+        .tabel-pesanan td:last-child { border-bottom: none; }
     }
 </style>
 
@@ -55,17 +72,10 @@
         <div class="judul-halaman">Manajemen Pesanan</div>
         <span class="subjudul-halaman">Daftar Transaksi - {{ $shop->name }}</span>
     </div>
-    <!-- LINK KE PAGE BARU -->
     <a href="{{ route('owner.pesanan.create') }}" class="btn-aksi btn-tambah">
         <i class="fas fa-plus"></i> Buat Pesanan Baru
     </a>
 </div>
-
-@if(session('success'))
-<div style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(34, 197, 94, 0.3);">
-    <i class="fas fa-check-circle"></i> {{ session('success') }}
-</div>
-@endif
 
 <div class="kartu-mewah">
     <div class="table-responsive">
@@ -109,15 +119,20 @@
                     <td data-label="Aksi">
                         <div style="display: flex; gap: 8px; justify-content: flex-end;">
                             @if($order->status == 'pending')
-                            <form action="{{ route('owner.pesanan.status', $order->id) }}" method="POST">
+                            <form action="{{ route('owner.pesanan.status', $order->id) }}" method="POST" class="form-lunas">
                                 @csrf @method('PUT')
                                 <input type="hidden" name="status" value="success">
-                                <button type="submit" class="btn-aksi btn-update" style="padding: 8px 12px;" title="Tandai Lunas"><i class="fas fa-check"></i></button>
+                                <button type="button" class="btn-aksi btn-update btn-confirm-lunas" style="padding: 8px 12px;" title="Tandai Lunas">
+                                    <i class="fas fa-check"></i>
+                                </button>
                             </form>
                             @endif
-                            <form action="{{ route('owner.pesanan.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Hapus transaksi ini?')">
+                            
+                            <form action="{{ route('owner.pesanan.destroy', $order->id) }}" method="POST" class="form-hapus">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-aksi btn-hapus" style="padding: 8px 12px;"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="btn-aksi btn-hapus btn-confirm-hapus" style="padding: 8px 12px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -129,4 +144,69 @@
         </table>
     </div>
 </div>
+
+<script>
+    // 1. Popup Sukses (Jika ada session success)
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            background: 'rgba(15, 23, 42, 0.9)',
+            color: '#fff',
+            customClass: { popup: 'swal-custom' },
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true
+        });
+    @endif
+
+    // 2. Konfirmasi Hapus
+    document.querySelectorAll('.btn-confirm-hapus').forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('.form-hapus');
+            Swal.fire({
+                title: 'Hapus Transaksi?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#475569',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                background: 'rgba(15, 23, 42, 0.9)',
+                color: '#fff',
+                customClass: { popup: 'swal-custom' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // 3. Konfirmasi Tandai Lunas
+    document.querySelectorAll('.btn-confirm-lunas').forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('.form-lunas');
+            Swal.fire({
+                title: 'Konfirmasi Pembayaran',
+                text: "Tandai transaksi ini sebagai Lunas?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#475569',
+                confirmButtonText: 'Ya, Lunas!',
+                cancelButtonText: 'Batal',
+                background: 'rgba(15, 23, 42, 0.9)',
+                color: '#fff',
+                customClass: { popup: 'swal-custom' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
 @endsection

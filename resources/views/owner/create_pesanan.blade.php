@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Tambahkan Library SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
 <style>
@@ -25,12 +27,22 @@
         display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end;
     }
 
-    .btn-aksi { padding: 12px 20px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: #fff; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; justify-content: center; }
+    .btn-aksi { padding: 12px 20px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: #fff; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; justify-content: center; transition: 0.3s; }
+    .btn-aksi:hover { transform: translateY(-2px); opacity: 0.9; }
 
     @media (max-width: 768px) {
         .baris-produk { grid-template-columns: 1fr; gap: 10px; position: relative; padding-top: 45px; }
         .btn-hapus-item { position: absolute; top: 12px; right: 12px; }
         .grid-mobile { grid-template-columns: 1fr !important; }
+    }
+
+    /* Custom SweetAlert Style */
+    .swal2-popup {
+        background: rgba(15, 23, 42, 0.9) !important;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 25px !important;
+        color: #fff !important;
     }
 </style>
 
@@ -38,7 +50,7 @@
 <span class="subjudul-halaman">Input transaksi manual - {{ $shop->name }}</span>
 
 <div class="kartu-mewah">
-    <form action="{{ route('owner.pesanan.store') }}" method="POST">
+    <form action="{{ route('owner.pesanan.store') }}" method="POST" id="formPesanan">
         @csrf
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" class="grid-mobile">
@@ -116,6 +128,33 @@
 </div>
 
 <script>
+    // --- LOGIKA POPUP MEWAH ---
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: 'rgba(15, 23, 42, 0.9)',
+            color: '#fff',
+            iconColor: '#4ade80'
+        });
+    @endif
+
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html: '{!! implode("<br>", $errors->all()) !!}',
+            background: 'rgba(15, 23, 42, 0.9)',
+            color: '#fff',
+            confirmButtonColor: '#0284c7'
+        });
+    @endif
+
+    // --- LOGIKA FORM ---
     let barisKe = 1;
     function tambahBarisProduk() {
         const container = document.getElementById('container-produk');
