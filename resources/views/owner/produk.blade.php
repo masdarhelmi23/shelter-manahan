@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Tambahkan library SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
 <style>
@@ -376,36 +374,18 @@ td{
         padding:13px 16px;
     }
 }
-
-/* Custom SweetAlert2 Style to match your UI */
-.swal2-popup {
-    background: rgba(30, 41, 59, 0.95) !important;
-    backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-    border-radius: 25px !important;
-    color: #fff !important;
-}
-.swal2-title { color: #fff !important; }
-.swal2-html-container { color: #cbd5e1 !important; }
 </style>
 
 {{-- ALERT --}}
 @if(session('success'))
-<script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: "{{ session('success') }}",
-        background: 'rgba(30, 41, 59, 0.95)',
-        color: '#fff',
-        confirmButtonColor: '#0284c7',
-        timer: 3000
-    });
-</script>
+<div style="background: rgba(34,197,94,.2); backdrop-filter: blur(10px); color:#4ade80; padding:20px; border-radius:20px; margin-bottom:30px; border:1px solid rgba(74,222,128,.3);">
+    <i class="fas fa-check-circle"></i> {{ session('success') }}
+</div>
 @endif
 
 <!-- HEADER -->
 <div class="header-produk">
+
     <div>
         <h1 class="judul-halaman">Katalog Produk</h1>
         <p class="subjudul-halaman">
@@ -417,6 +397,7 @@ td{
         <i class="fa-solid fa-plus"></i>
         TAMBAH MENU BARU
     </a>
+
 </div>
 
 <!-- TABLE / MOBILE -->
@@ -440,6 +421,7 @@ td{
             <tr>
                 <td>
                     <div class="produk-info">
+
                         <div class="produk-img-wrapper">
                             @if($item->foto)
                                 <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama_produk }}">
@@ -454,10 +436,12 @@ td{
                             <div style="font-weight:800; font-size:16px;">
                                 {{ $item->nama_produk }}
                             </div>
+
                             <div style="font-size:11px; color:#94a3b8; margin-top:2px; font-weight:600;">
                                 REF-ID: #{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}
                             </div>
                         </div>
+
                     </div>
                 </td>
 
@@ -482,19 +466,23 @@ td{
                 </td>
 
                 <td style="text-align:right; white-space:nowrap;">
+
                     <a href="{{ route('owner.produk.edit', $item->id) }}" class="aksi-link edit">
                         EDIT
                     </a>
 
                     <form action="{{ route('owner.produk.destroy', $item->id) }}"
                           method="POST"
-                          class="hapus-form form-delete">
+                          class="hapus-form"
+                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                         @csrf
                         @method('DELETE')
-                        <button type="button" class="hapus-btn btn-delete-trigger">
+
+                        <button type="submit" class="hapus-btn">
                             HAPUS
                         </button>
                     </form>
+
                 </td>
             </tr>
             @empty
@@ -513,9 +501,13 @@ td{
 
     <!-- MOBILE CARD -->
     <div class="mobile-list">
+
         @forelse($produk ?? [] as $item)
+
         <div class="mobile-card">
+
             <div class="mobile-top">
+
                 <div class="produk-img-wrapper">
                     @if($item->foto)
                         <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama_produk }}">
@@ -530,6 +522,7 @@ td{
                     <h4>{{ $item->nama_produk }}</h4>
                     <p>REF-ID #{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</p>
                 </div>
+
             </div>
 
             <div class="mobile-row">
@@ -554,6 +547,7 @@ td{
             </div>
 
             <div class="mobile-action">
+
                 <a href="{{ route('owner.produk.edit', $item->id) }}" class="aksi-link edit">
                     EDIT
                 </a>
@@ -561,67 +555,44 @@ td{
                 <form action="{{ route('owner.produk.destroy', $item->id) }}"
                       method="POST"
                       style="flex:1;"
-                      class="form-delete">
+                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="hapus-btn btn-delete-trigger" style="width:100%;">
+
+                    <button type="submit" class="hapus-btn" style="width:100%;">
                         HAPUS
                     </button>
                 </form>
+
             </div>
+
         </div>
+
         @empty
+
         <div style="text-align:center; padding:40px 15px; color:#cbd5e1;">
             <i class="fa-solid fa-box-open" style="font-size:42px; margin-bottom:15px; display:block; opacity:.3;"></i>
             Belum ada data produk dalam database warung Anda.
         </div>
+
         @endforelse
+
     </div>
+
 </div>
 
 <!-- FOOTER -->
 <div class="footer-katalog">
+
     <div>
         TOTAL ENTITAS:
         <span style="color:#ffffff;">
             {{ $produk ? $produk->count() : 0 }} Produk
         </span>
     </div>
-</div>
 
-{{-- SCRIPT MEWAH UNTUK POPUP --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const deleteButtons = document.querySelectorAll('.btn-delete-trigger');
-        
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                const form = this.closest('form');
-                
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Data produk yang dihapus tidak dapat dikembalikan!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Ya, Hapus!',
-                    cancelButtonText: 'Batalkan',
-                    reverseButtons: true,
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInUp animate__faster'
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutDown animate__faster'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    });
-</script>
+   
+
+</div>
 
 @endsection
