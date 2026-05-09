@@ -4,25 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // Import Trait SoftDeletes
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; // Gunakan Trait SoftDeletes di sini
 
-    // Tentukan nama tabel jika tidak jamak (optional, biasanya otomatis 'products')
+    // Nama tabel (opsional, Laravel otomatis mencari 'products')
     protected $table = 'products';
 
-    // Daftarkan kolom yang bisa diisi (Mass Assignment)
-    // Sesuaikan dengan nama kolom di database kamu (Anjay, sesuaikan ya!)
-
-    // Sesuaikan beneran sama database kamu yang baru (Foto dihapus)
+    /**
+     * Kolom yang bisa diisi (Mass Assignment)
+     * Tambahkan 'category_id' jika memang ada di database agar tidak error saat create/update
+     */
     protected $fillable = [
         'shop_id',
+        'category_id',
         'nama_produk',
         'harga',
         'status',
         'foto',
     ];
+
+    /**
+     * Kolom yang harus dikonversi ke tipe data Carbon (tanggal)
+     */
+    protected $dates = ['deleted_at'];
 
     /**
      * Relasi ke Toko (Shop)
@@ -41,13 +48,23 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
+
+    /**
+     * Relasi ke OrderDetail
+     * Digunakan untuk mengecek riwayat transaksi sebelum benar-benar dihapus (opsional)
+     */
     public function details()
     {
-        // Produk ini muncul di banyak baris detail pesanan
+        // Pastikan nama modelnya OrderDetail atau sesuai dengan file Model Anda
         return $this->hasMany(OrderDetail::class, 'product_id');
+    }
+
+    /**
+     * Relasi ke Orders (Jika melalui tabel detail)
+     * Biasanya produk tidak langsung ke Order, tapi lewat OrderDetail
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class); 
     }
 }
