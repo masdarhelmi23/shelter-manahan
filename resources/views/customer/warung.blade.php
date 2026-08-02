@@ -5,36 +5,56 @@
 @section('extra-css')
 <style>
     /* =========================================
-        MODERN EXECUTIVE DARK (STAY AUTHENTIC)
+        MODERN CULINARY (GAMBAR KULINER TIPIS / SAMAR)
     ========================================= */
     body {
+        /* 
+           Lapisan 1: Warna putih dengan transparansi 90% (0.90) agar gambar tipis
+           Lapisan 2: Gambar Kuliner / Makanan dari Unsplash
+        */
         background: 
-            radial-gradient(circle at top right, rgba(2, 132, 199, 0.15), transparent),
-            linear-gradient(to bottom, rgba(0, 0, 0, 0.92), rgba(15, 23, 42, 0.96)),
-            url('https://www.transparenttextures.com/patterns/dark-matter.png'),
+            linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)),
             url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
-        background-size: cover; background-position: center; background-attachment: fixed;
+        background-size: cover; 
+        background-position: center; 
+        background-attachment: fixed;
+        color: #0f172a;
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* SHOP HEADER */
-    .shop-header { position: relative; padding: 60px 20px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-    .shop-logo { width: 140px; height: 140px; border-radius: 35px; margin: 0 auto 25px; overflow: hidden; background: #fff; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+    /* SHOP HEADER - Dibuat sedikit blur agar teks lebih menonjol */
+    .shop-header { 
+        position: relative; 
+        padding: 50px 20px 40px; 
+        text-align: center; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        background: rgba(255, 255, 255, 0.6); 
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        margin-bottom: 40px;
+    }
+    .shop-logo { width: 140px; height: 140px; border-radius: 35px; margin: 0 auto 25px; overflow: hidden; background: #fff; border: 4px solid #fff; box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
     .shop-logo img { width: 100%; height: 100%; object-fit: cover; }
-    .shop-name { font-size: 42px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 10px; }
+    .shop-name { font-size: 42px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(255,255,255,1); margin-bottom: 10px; }
     
     .shop-hours { 
         display: flex; align-items: center; gap: 12px; margin-bottom: 25px; 
-        color: #cbd5e1; font-size: 14px; font-weight: 600;
-        background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 50px;
-        border: 1px solid rgba(255,255,255,0.1);
+        color: #334155; font-size: 14px; font-weight: 700;
+        background: rgba(255,255,255,0.9); padding: 8px 20px; border-radius: 50px;
+        border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
-    .badge-open { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-    .badge-closed { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-open { background: rgba(34, 197, 94, 0.15); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .badge-closed { background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
 
     .social-actions { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-    .btn-social { padding: 12px 25px; border-radius: 12px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1); color: #fff; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); transition: 0.3s; text-transform: uppercase; text-decoration: none; }
-    .btn-social:hover { background: var(--primary); transform: translateY(-3px); }
+    .btn-social { padding: 12px 25px; border-radius: 12px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 10px; background: #fff; color: #1e293b; border: 1px solid rgba(0, 0, 0, 0.05); transition: 0.3s; text-transform: uppercase; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .btn-social:hover { background: #ea580c; color: #fff; transform: translateY(-3px); border-color: transparent; box-shadow: 0 8px 15px rgba(234, 88, 12, 0.2); }
 
     /* MODERN SPLIT LAYOUT */
     .container { width: 92%; max-width: 1400px; margin: 0 auto; padding-bottom: 100px; }
@@ -42,56 +62,70 @@
 
     /* MENU GRID */
     .grid-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-    .card-menu { background: #fff; border-radius: 28px; overflow: hidden; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .card-menu:hover { transform: translateY(-12px); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4); }
-    .img-wrapper { width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #f8fafc; }
+    .card-menu { 
+        background: rgba(255, 255, 255, 0.95); 
+        backdrop-filter: blur(5px); 
+        -webkit-backdrop-filter: blur(5px);
+        border-radius: 28px; 
+        overflow: hidden; 
+        border: 1px solid rgba(0,0,0,0.05); 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    .card-menu:hover { transform: translateY(-12px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); background: #fff; }
+    .img-wrapper { width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #f1f5f9; }
     .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
     .card-body { padding: 22px; text-align: center; }
-    .card-title { font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
-    .card-price { font-size: 21px; font-weight: 800; color: var(--primary); margin-bottom: 18px; }
+    .card-title { font-size: 19px; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+    .card-price { font-size: 21px; font-weight: 800; color: #ea580c; margin-bottom: 18px; } /* Warna Oranye Nafsu Makan */
 
     /* QTY SELECTOR */
-    .qty-box { display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 15px; padding: 5px; border: 1px solid #e2e8f0; }
+    .qty-box { display: flex; align-items: center; justify-content: center; background: rgba(241, 245, 249, 0.8); border-radius: 15px; padding: 5px; border: 1px solid rgba(226, 232, 240, 0.8); }
     .btn-qty { width: 38px; height: 38px; border: none; background: #fff; color: #0f172a; border-radius: 10px; cursor: pointer; font-weight: 800; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .btn-qty:hover { background: var(--primary); color: #fff; }
-    .input-qty { width: 45px; border: none; background: transparent; text-align: center; font-weight: 800; font-size: 16px; }
+    .btn-qty:hover { background: #ea580c; color: #fff; }
+    .input-qty { width: 45px; border: none; background: transparent; text-align: center; font-weight: 800; font-size: 16px; color: #0f172a; }
 
     /* SIDEBAR RINCIAN (EXECUTIVE STYLE) */
     .sidebar-rincian { 
-        position: sticky; top: 100px; background: rgba(255, 255, 255, 0.05); 
-        backdrop-filter: blur(25px); border-radius: 35px; padding: 35px; 
-        border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 80px rgba(0,0,0,0.5); 
+        position: sticky; top: 100px; 
+        background: rgba(255, 255, 255, 0.95); 
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+        border-radius: 35px; padding: 35px; 
+        border: 1px solid rgba(255,255,255,1); 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
     }
-    .sidebar-title { color: #fff; font-size: 22px; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
-    .sidebar-title i { color: var(--primary); }
+    .sidebar-title { color: #1e293b; font-size: 22px; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
+    .sidebar-title i { color: #ea580c; }
 
     /* FORM INPUT STYLE */
-    .label-mewah { color: #fcd34d; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
-    .input-mewah { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; margin-bottom: 15px; outline: none; }
+    .label-mewah { color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .input-mewah { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; color: #0f172a; margin-bottom: 15px; outline: none; transition: 0.3s; }
+    .input-mewah:focus { border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1); }
 
-    .rincian-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .rincian-info b { display: block; color: #fff; font-size: 15px; }
-    .rincian-info span { color: #94a3b8; font-size: 12px; font-weight: 600; }
-    .rincian-sub { color: #fff; font-weight: 800; font-size: 17px; }
+    .rincian-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+    .rincian-info b { display: block; color: #1e293b; font-size: 15px; }
+    .rincian-info span { color: #64748b; font-size: 12px; font-weight: 600; }
+    .rincian-sub { color: #1e293b; font-weight: 800; font-size: 17px; }
 
-    .total-section { background: rgba(2, 132, 199, 0.1); border-radius: 20px; padding: 25px; margin-top: 25px; border: 1px solid rgba(2, 132, 199, 0.2); }
-    .total-label { color: #cbd5e1; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-    .total-amount { color: #fff; font-size: 32px; font-weight: 900; }
+    .total-section { background: #fff8f1; border-radius: 20px; padding: 25px; margin-top: 25px; border: 1px solid #ffedd5; }
+    .total-label { color: #9a3412; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+    .total-amount { color: #ea580c; font-size: 32px; font-weight: 900; }
 
     .btn-cart {
         width: 100%; margin-top: 25px; padding: 20px; border-radius: 18px; border: none;
-        background: linear-gradient(135deg, #0284c7, #0369a1);
+        background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
         color: #fff; font-weight: 800; font-size: 14px; cursor: pointer;
         transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
         display: flex; align-items: center; justify-content: center; gap: 12px;
+        box-shadow: 0 10px 20px rgba(234, 88, 12, 0.2);
     }
-    .btn-cart:hover:not(:disabled) { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(2, 132, 199, 0.4); }
-    .btn-cart:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+    .btn-cart:hover:not(:disabled) { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(234, 88, 12, 0.4); }
+    .btn-cart:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); box-shadow: none; }
 
     /* CLOSED STATE OVERLAY */
     .closed-banner {
-        background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
-        padding: 15px; border-radius: 20px; color: #f87171; font-weight: 800;
+        background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
+        padding: 15px; border-radius: 20px; color: #dc2626; font-weight: 800;
         text-align: center; margin-bottom: 30px; backdrop-filter: blur(10px);
     }
 
@@ -174,7 +208,7 @@
                             </div>
                         </div>
                     @empty
-                        <p style="color: #fff; opacity: 0.5; text-align: center; grid-column: 1/-1;">Menu belum tersedia.</p>
+                        <p style="color: #475569; font-weight: 600; text-align: center; grid-column: 1/-1; background: rgba(255,255,255,0.8); padding: 20px; border-radius: 15px;">Menu belum tersedia.</p>
                     @endforelse
                 </div>
             </div>
@@ -188,28 +222,28 @@
                     <!-- IDENTITAS CUSTOMER -->
                     <div style="margin-bottom: 20px;">
                         <label class="label-mewah">Nama Lengkap</label>
-                        <input type="text" id="cust_name" class="input-mewah" placeholder="Nama Pesanan">
+                        <input type="text" id="cust_name" class="input-mewah" placeholder="Nama Pemesan">
                         
                         <label class="label-mewah">Nomor WhatsApp</label>
                         <input type="number" id="cust_wa" class="input-mewah" placeholder="Contoh: 081234xxx">
                     </div>
 
                     <div id="struk-list">
-                        <div style="text-align: center; padding: 20px 0; opacity: 0.2; color: #fff;">
+                        <div style="text-align: center; padding: 20px 0; opacity: 0.5; color: #64748b;">
                             <i class="fa-solid fa-basket-shopping fa-3x mb-3"></i>
                             <p>Belum ada menu dipilih</p>
                         </div>
                     </div>
 
                     <!-- METODE PEMBAYARAN -->
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(248, 250, 252, 0.8); border-radius: 15px; border: 1px solid #e2e8f0;">
                         <label class="label-mewah">Metode Pembayaran</label>
                         <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <label style="color: #fff; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <label style="color: #0f172a; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;">
                                 <input type="radio" name="payment_method" value="cashier" checked onchange="renderStruk()"> 
                                 Bayar di Kasir (Rp 0)
                             </label>
-                            <label style="color: #fff; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <label style="color: #0f172a; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;">
                                 <input type="radio" name="payment_method" value="midtrans" onchange="renderStruk()"> 
                                 Transfer / Midtrans (+Rp 2.500)
                             </label>
@@ -217,7 +251,7 @@
                     </div>
 
                     <div class="total-section">
-                        <div style="display: flex; justify-content: space-between; color: #94a3b8; font-size: 12px; margin-bottom: 5px;">
+                        <div style="display: flex; justify-content: space-between; color: #64748b; font-size: 12px; margin-bottom: 5px; font-weight: 600;">
                             <span>Biaya Admin:</span>
                             <span id="txt-admin-fee">Rp 0</span>
                         </div>
@@ -238,7 +272,6 @@
         const ADMIN_FEE_MIDTRANS = 2500;
 
         function updateStruk(id, name, price, delta) {
-            // Cek status buka lewat variabel Blade yang dipassing ke string
             if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") return;
 
             if (!keranjangSementara[id]) {
@@ -288,11 +321,10 @@
             totalTxt.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
 
             if (!adaItem) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px 0; opacity: 0.2; color: #fff;"><i class="fa-solid fa-basket-shopping fa-3x mb-3"></i><p>Belum ada menu dipilih</p></div>`;
+                container.innerHTML = `<div style="text-align: center; padding: 40px 0; opacity: 0.5; color: #64748b;"><i class="fa-solid fa-basket-shopping fa-3x mb-3"></i><p>Belum ada menu dipilih</p></div>`;
                 btnCart.disabled = true;
             } else {
                 container.innerHTML = html;
-                // Tombol hanya aktif jika ada item DAN warung buka
                 btnCart.disabled = ("{{ $isOpen }}" == "1") ? false : true;
             }
         }
@@ -312,7 +344,6 @@
                 return;
             }
 
-            // Munculkan loading
             Swal.fire({ 
                 title: 'Memproses Pesanan...', 
                 allowOutsideClick: false,
@@ -340,8 +371,6 @@
                     Swal.fire('Berhasil!', 'Pesanan Anda telah diterima.', 'success')
                     .then(() => {
                         if(paymentMethod === 'midtrans') {
-                            // Redirect ke halaman checkout dengan parameter ID
-                            // Menggunakan placeholder :id untuk direplace dengan order_id asli
                             let url = "{{ route('customer.checkout', [ 'id' => ':id' ]) }}";
                             window.location.href = url.replace(':id', result.order_id);
                         } else {

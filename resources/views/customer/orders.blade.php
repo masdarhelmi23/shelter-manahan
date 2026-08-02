@@ -5,32 +5,34 @@
 @section('extra-css')
 <style>
     /* =========================================
-        PREMIUM DARK AESTHETIC (CLEAN GLASS)
+        MODERN CULINARY AESTHETIC (GAMBAR TIPIS)
     ========================================= */
     body {
+        /* Lapisan overlay putih 90% dipadu gambar kuliner yang sama */
         background: 
-            radial-gradient(circle at top right, rgba(2, 132, 199, 0.15), transparent),
-            linear-gradient(to bottom, rgba(0, 0, 0, 0.92), rgba(15, 23, 42, 0.95)),
-            url('https://www.transparenttextures.com/patterns/dark-matter.png'),
-            url('{{ asset("images/bg-shelter.jpg") }}');
+            linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)),
+            url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .container { width: 95%; max-width: 1300px; margin: 30px auto; padding-bottom: 100px; }
 
     /* HEADER PAGE */
     .page-header { margin-bottom: 30px; text-align: left; border-left: 5px solid #0284c7; padding-left: 20px; }
-    .page-header h1 { color: #fff; font-size: clamp(24px, 5vw, 32px); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    /* Warna teks diubah menjadi gelap agar terlihat di background putih tipis */
+    .page-header h1 { color: #1e293b; font-size: clamp(24px, 5vw, 32px); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
     /* GLASS CARD STYLE */
     .orders-glass-card {
         background: rgba(255, 255, 255, 0.98);
         border-radius: 30px;
         padding: 30px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-        border: 1px solid rgba(255,255,255,0.1);
+        /* Shadow diperhalus untuk tema terang */
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
     }
 
     .orders-table { width: 100%; border-collapse: collapse; }
@@ -59,7 +61,7 @@
         border: none; cursor: pointer; font-weight: 800; font-size: 10px; transition: 0.3s;
         display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase;
     }
-    .btn-detail:hover { background: #0284c7; transform: translateY(-2px); }
+    .btn-detail:hover { background: #ea580c; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(234, 88, 12, 0.3); }
 
     /* =========================================
         MOBILE RESPONSIVE REVISION
@@ -100,7 +102,7 @@
     /* POPUP NOTA */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
         display: none; justify-content: center; align-items: center;
         z-index: 999999; padding: 15px;
     }
@@ -109,7 +111,7 @@
     .nota-box {
         background: #fff; width: 100%; max-width: 450px;
         border-radius: 30px; overflow-y: auto; max-height: 90vh;
-        box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+        box-shadow: 0 30px 70px rgba(0,0,0,0.3);
         animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
