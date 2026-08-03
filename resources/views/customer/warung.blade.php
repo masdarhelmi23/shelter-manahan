@@ -5,15 +5,11 @@
 @section('extra-css')
 <style>
     /* =========================================
-        MODERN CULINARY (GAMBAR KULINER TIPIS / SAMAR)
+       MODERN CULINARY (GAMBAR KULINER LEBIH JELAS)
     ========================================= */
     body {
-        /* 
-           Lapisan 1: Warna putih dengan transparansi 90% (0.90) agar gambar tipis
-           Lapisan 2: Gambar Kuliner / Makanan dari Unsplash
-        */
         background: 
-            linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)),
+            linear-gradient(rgba(255, 255, 255, 0.50), rgba(255, 255, 255, 0.50)),
             url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
         background-size: cover; 
         background-position: center; 
@@ -23,7 +19,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* SHOP HEADER - Dibuat sedikit blur agar teks lebih menonjol */
+    /* SHOP HEADER - Blur sedikit ditebalkan agar teks tetap terbaca */
     .shop-header { 
         position: relative; 
         padding: 50px 20px 40px; 
@@ -31,11 +27,11 @@
         display: flex; 
         flex-direction: column; 
         align-items: center; 
-        background: rgba(255, 255, 255, 0.6); 
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.85); 
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         margin-bottom: 40px;
     }
     .shop-logo { width: 140px; height: 140px; border-radius: 35px; margin: 0 auto 25px; overflow: hidden; background: #fff; border: 4px solid #fff; box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
@@ -77,7 +73,7 @@
     .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
     .card-body { padding: 22px; text-align: center; }
     .card-title { font-size: 19px; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
-    .card-price { font-size: 21px; font-weight: 800; color: #ea580c; margin-bottom: 18px; } /* Warna Oranye Nafsu Makan */
+    .card-price { font-size: 21px; font-weight: 800; color: #ea580c; margin-bottom: 18px; }
 
     /* QTY SELECTOR */
     .qty-box { display: flex; align-items: center; justify-content: center; background: rgba(241, 245, 249, 0.8); border-radius: 15px; padding: 5px; border: 1px solid rgba(226, 232, 240, 0.8); }
@@ -101,6 +97,7 @@
     .label-mewah { color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
     .input-mewah { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; color: #0f172a; margin-bottom: 15px; outline: none; transition: 0.3s; }
     .input-mewah:focus { border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1); }
+    .input-grup-waktu { display: flex; gap: 15px; }
 
     .rincian-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
     .rincian-info b { display: block; color: #1e293b; font-size: 15px; }
@@ -219,13 +216,21 @@
                         <i class="fa-solid fa-receipt"></i> RINCIAN PESANAN
                     </div>
 
-                    <!-- IDENTITAS CUSTOMER -->
+                    <!-- IDENTITAS CUSTOMER & JAM KEDATANGAN -->
                     <div style="margin-bottom: 20px;">
                         <label class="label-mewah">Nama Lengkap</label>
-                        <input type="text" id="cust_name" class="input-mewah" placeholder="Nama Pemesan">
+                        <input type="text" id="cust_name" class="input-mewah" placeholder="Nama Pemesan" required>
                         
-                        <label class="label-mewah">Nomor WhatsApp</label>
-                        <input type="number" id="cust_wa" class="input-mewah" placeholder="Contoh: 081234xxx">
+                        <div class="input-grup-waktu">
+                            <div style="flex: 1;">
+                                <label class="label-mewah">Nomor WhatsApp</label>
+                                <input type="number" id="cust_wa" class="input-mewah" placeholder="Contoh: 08123xxx" required>
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="label-mewah">Jam Datang</label>
+                                <input type="time" id="cust_time" class="input-mewah" required>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="struk-list">
@@ -332,10 +337,12 @@
         async function gasAddToCart() {
             const name = document.getElementById('cust_name').value;
             const wa = document.getElementById('cust_wa').value;
+            const time = document.getElementById('cust_time').value;
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-            if (!name || !wa) {
-                Swal.fire('Perhatian', 'Nama dan WhatsApp wajib diisi!', 'warning');
+            // Validasi ketiga input wajib diisi
+            if (!name || !wa || !time) {
+                Swal.fire('Perhatian', 'Nama, WhatsApp, dan Jam Kedatangan wajib diisi!', 'warning');
                 return;
             }
 
@@ -350,6 +357,9 @@
                 didOpen: () => { Swal.showLoading(); } 
             });
 
+            // Trik cerdas: Menambahkan jam kedatangan langsung ke dalam format nama
+            const finalCustomerName = name + " (Jam Datang: " + time + " WIB)";
+
             try {
                 const response = await fetch("{{ route('orders.store') }}", {
                     method: "POST",
@@ -358,7 +368,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        customer_name: name,
+                        customer_name: finalCustomerName, // Nama pelanggan yang sudah diselipkan jam
                         customer_whatsapp: wa,
                         payment_method: paymentMethod,
                         items: keranjangSementara

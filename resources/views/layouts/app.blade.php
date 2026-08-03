@@ -292,8 +292,14 @@
                         </a>
 
                         @if(auth()->user()->shop)
+                            @php
+                                // Menghitung total saldo asli yang sudah lunas/settlement
+                                $realBalance = \App\Models\Order::whereHas('details.product', function($q) {
+                                    $q->where('shop_id', auth()->user()->shop->id);
+                                })->whereIn('status', ['success', 'settlement', 'lunas', 'LUNAS', 'Lunas'])->sum('amount');
+                            @endphp
                             <a href="{{ route('owner.withdraw.index') }}" class="nav-item" style="color: #16a34a; background: rgba(22, 163, 74, 0.05);">
-                                <i class="fa-solid fa-wallet"></i> RP {{ number_format(auth()->user()->shop->balance ?? 0, 0, ',', '.') }}
+                                <i class="fa-solid fa-wallet"></i> RP {{ number_format($realBalance, 0, ',', '.') }}
                             </a>
                         @endif
 

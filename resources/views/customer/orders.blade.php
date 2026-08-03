@@ -5,42 +5,61 @@
 @section('extra-css')
 <style>
     /* =========================================
-        MODERN CULINARY AESTHETIC (GAMBAR TIPIS)
+        MODERN CULINARY AESTHETIC (GAMBAR JELAS)
     ========================================= */
     body {
-        /* Lapisan overlay putih 90% dipadu gambar kuliner yang sama */
+        /* Lapisan putih diturunkan ke 50% agar gambar kuliner lebih menonjol */
         background: 
-            linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)),
+            linear-gradient(rgba(255, 255, 255, 0.50), rgba(255, 255, 255, 0.50)),
             url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
     }
 
-    .container { width: 95%; max-width: 1300px; margin: 30px auto; padding-bottom: 100px; }
+    .container { width: 95%; max-width: 1300px; margin: 40px auto; padding-bottom: 100px; }
 
-    /* HEADER PAGE */
-    .page-header { margin-bottom: 30px; text-align: left; border-left: 5px solid #0284c7; padding-left: 20px; }
-    /* Warna teks diubah menjadi gelap agar terlihat di background putih tipis */
-    .page-header h1 { color: #1e293b; font-size: clamp(24px, 5vw, 32px); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    /* HEADER PAGE (Diberi efek glass agar terbaca jelas) */
+    .page-header { 
+        margin-bottom: 30px; 
+        text-align: left; 
+        border-left: 6px solid #0284c7; 
+        padding: 20px 25px; 
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .page-header h1 { 
+        color: #1e293b; 
+        font-size: clamp(24px, 5vw, 32px); 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        margin: 0;
+    }
 
-    /* GLASS CARD STYLE */
+    /* GLASS CARD STYLE UNTUK TABEL */
     .orders-glass-card {
-        background: rgba(255, 255, 255, 0.98);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-radius: 30px;
         padding: 30px;
-        /* Shadow diperhalus untuk tema terang */
         box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-        border: 1px solid rgba(0,0,0,0.05);
+        border: 1px solid rgba(255,255,255,0.8);
     }
 
     .orders-table { width: 100%; border-collapse: collapse; }
     .orders-table th { 
-        text-align: left; padding: 15px; color: #94a3b8; font-size: 11px; 
-        text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid #f1f5f9; 
+        text-align: left; padding: 15px; color: #64748b; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(0,0,0,0.05); 
     }
-    .orders-table td { padding: 20px 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .orders-table td { padding: 20px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
 
     /* INFO STYLING */
     .order-id { font-size: 15px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
@@ -52,8 +71,8 @@
         padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; 
         text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;
     }
-    .status-pending { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-    .status-success { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+    .status-pending { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
+    .status-success { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
 
     /* BUTTON ACTION */
     .btn-detail {
@@ -71,19 +90,22 @@
         .orders-table, .orders-table tbody, .orders-table tr, .orders-table td { display: block; width: 100%; }
         
         .orders-table tr { 
-            background: #fff; margin-bottom: 20px; border: 1px solid #e2e8f0; 
+            background: rgba(255, 255, 255, 0.95); margin-bottom: 20px; border: 1px solid #e2e8f0; 
             border-radius: 20px; padding: 15px; position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
         }
         
         .orders-table td { 
             border-bottom: none; padding: 10px 0; display: flex; 
             justify-content: space-between; align-items: center; 
-            text-align: right;
+            text-align: right; border-bottom: 1px dashed rgba(0,0,0,0.05);
         }
+
+        .orders-table td:last-child { border-bottom: none; }
 
         .orders-table td::before {
             content: attr(data-label);
-            font-weight: 800; color: #94a3b8; text-transform: uppercase;
+            font-weight: 800; color: #64748b; text-transform: uppercase;
             font-size: 10px; text-align: left; flex: 1;
             margin-right: 15px;
         }
@@ -95,7 +117,7 @@
             align-items: flex-end;
         }
 
-        .btn-detail { width: 100%; justify-content: center; margin-top: 10px; }
+        .btn-detail { width: 100%; justify-content: center; margin-top: 10px; padding: 15px; font-size: 12px; }
         .orders-glass-card { padding: 15px; border-radius: 25px; }
     }
 
@@ -124,7 +146,7 @@
     .nota-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569; }
     .total-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid #f1f5f9; }
 
-    .unpaid-bill { background: #fef2f2; color: #ef4444; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; font-weight: 800; border: 1px solid #fee2e2; }
+    .unpaid-bill { background: #fff7ed; color: #ea580c; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; font-weight: 800; border: 1px solid #ffedd5; }
     .paid-bill { background: #f0fdf4; color: #16a34a; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; font-weight: 800; border: 1px solid #dcfce7; }
 </style>
 @endsection
@@ -155,13 +177,13 @@
                                     <div class="order-id">#{{ $order->order_id }}</div>
                                     <!-- MENAMPILKAN NAMA WARUNG -->
                                     <div class="shop-name"><i class="fa-solid fa-store"></i> {{ $order->shop->name ?? 'Warung Shelter' }}</div>
-                                    <div style="font-size: 11px; color: #94a3b8; margin-top: 5px;">{{ $order->created_at->format('d M Y, H:i') }} WIB</div>
+                                    <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-top: 5px;">{{ $order->created_at->format('d M Y, H:i') }} WIB</div>
                                 </div>
                             </td>
                             <td data-label="Pelanggan">
                                 <div class="mobile-data-wrapper">
                                     <div style="font-weight: 800; color: #0f172a; font-size: 15px;">{{ $order->customer_name ?? auth()->user()->name }}</div>
-                                    <div style="font-size: 12px; color: #16a34a; font-weight: 700;">
+                                    <div style="font-size: 12px; color: #16a34a; font-weight: 700; margin-top: 2px;">
                                         <i class="fa-brands fa-whatsapp"></i> {{ $order->customer_whatsapp ?? '-' }}
                                     </div>
                                 </div>
@@ -190,9 +212,10 @@
                 </tbody>
             </table>
         @else
-            <div style="text-align: center; padding: 50px 0; color: #94a3b8;">
+            <div style="text-align: center; padding: 50px 0; color: #64748b;">
                 <i class="fa-solid fa-receipt fa-4x" style="margin-bottom: 20px; opacity: 0.2;"></i>
-                <p style="font-weight: 700;">Belum ada riwayat pesanan.</p>
+                <p style="font-weight: 700; font-size: 16px;">Belum ada riwayat pesanan.</p>
+                <p style="font-size: 13px; opacity: 0.8;">Silakan buat pesanan terlebih dahulu di halaman menu.</p>
             </div>
         @endif
     </div>
@@ -229,7 +252,7 @@
 
         <div class="nota-footer">
             <div id="notaStatusBox"></div>
-            <button onclick="document.getElementById('modalNota').classList.remove('active')" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 15px; border: none; background: #f1f5f9; color: #475569; font-weight: 800; cursor: pointer;">TUTUP NOTA</button>
+            <button onclick="document.getElementById('modalNota').classList.remove('active')" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 15px; border: none; background: #f1f5f9; color: #475569; font-weight: 800; cursor: pointer; transition: 0.3s;">TUTUP NOTA</button>
         </div>
     </div>
 </div>
@@ -258,11 +281,11 @@
         if (status === 'pending') {
             statusBox.innerHTML = `<div class="unpaid-bill">SISA TAGIHAN: Rp ${parseInt(amount).toLocaleString('id-ID')}</div>`;
             notaIcon.className = "fa-solid fa-clock";
-            notaIcon.style.background = "#f59e0b";
+            notaIcon.style.background = "#f59e0b"; // Warna kuning oranye untuk pending
         } else {
             statusBox.innerHTML = `<div class="paid-bill">STATUS: TERBAYAR LUNAS</div>`;
             notaIcon.className = "fa-solid fa-circle-check";
-            notaIcon.style.background = "#16a34a";
+            notaIcon.style.background = "#16a34a"; // Warna hijau untuk lunas
         }
 
         document.getElementById('modalNota').classList.add('active');

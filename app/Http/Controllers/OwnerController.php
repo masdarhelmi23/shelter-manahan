@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use App\Models\Withdrawal;
 use Illuminate\Support\Facades\DB;
 
-
 class OwnerController extends Controller
 {
     /**
@@ -68,7 +67,6 @@ class OwnerController extends Controller
 
     /**
      * JALUR KHUSUS: Mengatur Durasi Libur Warung
-     * REVISI: Penambahan type-casting (int) untuk mencegah error pada PHP 8.4
      */
     public function setLibur(Request $request)
     {
@@ -117,7 +115,6 @@ class OwnerController extends Controller
             'nama_produk' => 'required|string|max:255',
             'harga'       => 'required|numeric',
             'foto'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            // Kita hapus validasi 'status' dari sini jika ingin otomatis 'aktif'
         ]);
 
         $shop = Auth::user()->shop;
@@ -134,7 +131,7 @@ class OwnerController extends Controller
             'shop_id'     => $shop->id,
             'nama_produk' => $request->nama_produk,
             'harga'       => $request->harga,
-            'status'      => 'aktif', // Kita set otomatis 'aktif' agar tidak error
+            'status'      => 'aktif', // Kita set otomatis 'aktif'
             'foto'        => $fotoPath,
         ]);
 
@@ -297,7 +294,7 @@ class OwnerController extends Controller
         Order::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Pesanan dihapus!');
     }
-    // Tambahkan fungsi withdraw di dalam OwnerController
+
     public function withdraw(Request $request)
     {
         $shop = auth()->user()->shop;
@@ -307,13 +304,10 @@ class OwnerController extends Controller
             'bank_info' => 'required|string',
         ]);
 
-        // Tetap cek apakah saldo cukup sebelum kirim permintaan
         if ($shop->balance < $request->amount) {
             return redirect()->back()->with('error', 'Saldo Anda tidak mencukupi.');
         }
 
-        // Buat data di tabel withdrawals dengan status 'pending'
-        // Saldo TIDAK dipotong di sini
         Withdrawal::create([
             'shop_id' => $shop->id,
             'amount' => $request->amount,
@@ -324,28 +318,58 @@ class OwnerController extends Controller
         return redirect()->back()->with('success', 'Permintaan penarikan telah dikirim ke Admin.');
     }
 
-    public function indexWithdraw()
+    // ==========================================
+    // FUNGSI UNTUK MENAMPILKAN LAPORAN PENDAPATAN
+    // ==========================================
+    public function indexWithdraw(Request $request)
     {
         $shop = Auth::user()->shop;
-        
-        // Ambil riwayat WD milik toko ini
-        $withdrawals = Withdrawal::where('shop_id', $shop->id)
-                        ->latest()
-                        ->get();
 
-        return view('owner.withdraw', compact('shop', 'withdrawals'));
+        if (!$shop) {
+            return redirect()->route('owner.dashboard')->with('error', 'Toko tidak ditemukan.');
+        }
+
+        $filterBulan = $request->input('bulan', Carbon::now()->format('Y-m'));
+        
+        // 1. Perbaikan sistem baca tanggal agar 100% akurat
+        $parts = explode('-', $filterBulan);
+        $year = $parts[0];
+        $month = $parts[1];
+
+        // 2. Tambahkan kata 'lunas' agar sesuai dengan tombol yang kamu klik di UI
+        $statusValid = ['success', 'settlement', 'lunas', 'LUNAS', 'Lunas'];
+
+        // 3. Tarik data pesanan dengan filter status yang baru
+        $orders = Order::whereHas('details.product', function ($query) use ($shop) {
+                           $query->where('shop_id', $shop->id);
+                       })
+                       ->whereIn('status', $statusValid) 
+                       ->whereYear('created_at', $year)
+                       ->whereMonth('created_at', $month)
+                       ->orderBy('created_at', 'desc')
+                       ->get();
+                       
+        // 4. Kalkulasi bulan ini
+        $pendapatanBulanIni = $orders->sum('amount');
+
+        // 5. Kalkulasi total keseluruhan
+        $totalPendapatanAsli = Order::whereHas('details.product', function ($query) use ($shop) {
+                                        $query->where('shop_id', $shop->id);
+                                    })
+                                    ->whereIn('status', $statusValid)
+                                    ->sum('amount');
+
+        return view('owner.withdraw', compact('shop', 'orders', 'filterBulan', 'pendapatanBulanIni', 'totalPendapatanAsli'));
     }
 
     public function createPesanan()
     {
         $shop = auth()->user()->shop;
         
-        // Jika owner belum punya toko, arahkan balik
         if (!$shop) {
             return redirect()->route('owner.dashboard')->with('error', 'Aktifkan warung terlebih dahulu.');
         }
 
-        // Ambil produk milik toko tersebut untuk dipilih di form
         $products = $shop->products()->where('status', 'aktif')->get();
 
         return view('owner.create_pesanan', compact('shop', 'products'));
