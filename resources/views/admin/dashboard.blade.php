@@ -1,6 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    // Mengambil data jumlah transaksi berhasil selama 6 bulan terakhir
+    $bulanLabels = [];
+    $dataTransaksi = [];
+    
+    for ($i = 5; $i >= 0; $i--) {
+        $month = \Carbon\Carbon::today()->subMonths($i);
+        $bulanLabels[] = $month->translatedFormat('M Y');
+        
+        // Menghitung jumlah order dengan status 'success' pada bulan dan tahun tersebut
+        $dataTransaksi[] = \App\Models\Order::where('status', 'success')
+            ->whereMonth('created_at', $month->month)
+            ->whereYear('created_at', $month->year)
+            ->count();
+    }
+@endphp
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <!-- Tambahan Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -122,7 +139,8 @@
             <div style="margin-bottom: 20px;">
                 <span class="label-kpi" style="margin-bottom: 5px;">Volume Transaksi (Hari Ini)</span>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="color: #4ade80; font-weight: 800; font-size: 16px;">Rp {{ number_format(\App\Models\Order::where('status', 'paid')->whereDate('created_at', today())->sum('amount'), 0, ',', '.') }}</span>
+                    <!-- Perbaikan status dari 'paid' menjadi 'success' -->
+                    <span style="color: #4ade80; font-weight: 800; font-size: 16px;">Rp {{ number_format(\App\Models\Order::where('status', 'success')->whereDate('created_at', today())->sum('amount'), 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
@@ -130,17 +148,19 @@
 </div>
 
 <script>
-    // Inisialisasi Grafik Analitik di Dashboard Admin
+    // Inisialisasi Grafik Analitik di Dashboard Admin dengan Data Real
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('adminStatsChart').getContext('2d');
         
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                // Parse label bulan dari PHP ke JS
+                labels: {!! json_encode($bulanLabels) !!},
                 datasets: [{
-                    label: 'Aktivitas Tenant',
-                    data: [12, 19, 3, 5, 2, 3],
+                    label: 'Total Transaksi Berhasil',
+                    // Parse data nominal/jumlah dari PHP ke JS
+                    data: {!! json_encode($dataTransaksi) !!},
                     borderColor: '#fcd34d',
                     backgroundColor: 'rgba(252, 211, 77, 0.1)',
                     borderWidth: 3,
@@ -155,8 +175,18 @@
                     legend: { labels: { color: '#fff' } }
                 },
                 scales: {
-                    x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    x: { 
+                        ticks: { color: '#94a3b8' }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' } 
+                    },
+                    y: { 
+                        ticks: { 
+                            color: '#94a3b8',
+                            stepSize: 1, // Memastikan Y-Axis tidak desimal karena ini jumlah transaksi
+                            precision: 0 
+                        }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' } 
+                    }
                 }
             }
         });

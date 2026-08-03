@@ -273,9 +273,7 @@
                         <a href="{{ route('admin.shops') }}" class="nav-item {{ request()->routeIs('admin.shops') ? 'active' : '' }}">
                             <i class="fa-solid fa-shop"></i> KONTROL TOKO
                         </a>
-                        <a href="{{ route('admin.withdrawals') }}" class="nav-item {{ request()->routeIs('admin.withdrawals') ? 'active' : '' }}">
-                            <i class="fa-solid fa-money-bill-transfer"></i> PENARIKAN TENANT
-                        </a>
+                        
 
                     @elseif(auth()->user()->role === 'owner')
                         <a href="{{ route('owner.dashboard') }}" class="nav-item {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}">

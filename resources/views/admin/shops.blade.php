@@ -2,8 +2,6 @@
 
 @section('content')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<!-- Tambahan Chart.js untuk Grafik Visual -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
     .management-container { padding: 20px 0; min-height: 100vh; font-family: 'Inter', sans-serif; }
@@ -16,10 +14,10 @@
     .page-header h1 { font-size: 36px; font-weight: 800; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
     .page-header p { color: #fcd34d; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
 
-    /* Layout Grid untuk Widget & Grafik Pengganti Saldo */
+    /* Layout Penyesuaian untuk Single Widget */
     .dashboard-grid-top {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: inline-flex;
+        min-width: 300px;
         gap: 20px;
         margin-bottom: 30px;
     }
@@ -28,13 +26,14 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
-        padding: 25px;
+        padding: 25px 35px 25px 25px;
         display: flex;
         align-items: center;
         gap: 20px;
         backdrop-filter: blur(10px);
         height: 100%;
         box-sizing: border-box;
+        width: 100%;
     }
     .summary-icon {
         width: 60px; height: 60px;
@@ -128,8 +127,8 @@
     @media (max-width: 768px) {
         .page-header h1 { font-size: 26px; }
         .page-header p { font-size: 11px; }
-        .dashboard-grid-top { grid-template-columns: 1fr; }
-        .summary-card { padding: 15px; }
+        .dashboard-grid-top { display: flex; width: 100%; }
+        .summary-card { padding: 15px; width: 100%; }
         .luxury-card { padding: 15px; border-radius: 20px; }
 
         .custom-table thead { display: none; }
@@ -152,7 +151,7 @@
             <p>Kontrol Otoritas & Status Operasional Shelter Manahan</p>
         </div>
 
-        <!-- Dashboard Grid Pengganti Saldo (Statistik Toko & Grafik Mini) -->
+        <!-- Dashboard Grid (Statistik Toko Tunggal) -->
         <div class="dashboard-grid-top">
             <div class="summary-card">
                 <div class="summary-icon">
@@ -161,12 +160,6 @@
                 <div class="summary-info">
                     <h4>Total Tenant Terdaftar</h4>
                     <h2>{{ $shops->count() }} Unit Toko</h2>
-                </div>
-            </div>
-
-            <div class="summary-card" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
-                <div style="width: 100%; height: 70px;">
-                    <canvas id="miniShopChart"></canvas>
                 </div>
             </div>
         </div>
@@ -255,35 +248,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Script Chart.js untuk visualisasi status toko di halaman index
-    document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('miniShopChart').getContext('2d');
-        const activeCount = "{{ $shops->where('status', 'active')->count() }}";
-        const pendingCount = "{{ $shops->where('status', 'pending')->count() }}";
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Aktif', 'Non-Aktif'],
-                datasets: [{
-                    label: 'Jumlah Toko',
-                    data: [activeCount, pendingCount],
-                    backgroundColor: ['#4ade80', '#fbbf24'],
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { ticks: { color: '#fff', font: { size: 10 } }, grid: { display: false } },
-                    y: { ticks: { color: '#fff', font: { size: 10 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                }
-            }
-        });
-    });
-</script>
 @endsection

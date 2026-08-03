@@ -1,6 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    // Mengambil data jumlah pesanan berhasil 7 hari terakhir khusus untuk toko ini
+    $labels = [];
+    $dataPesanan = [];
+    
+    for ($i = 6; $i >= 0; $i--) {
+        $date = \Carbon\Carbon::today()->subDays($i);
+        $labels[] = $date->translatedFormat('d M Y');
+        
+        $dataPesanan[] = \App\Models\Order::where('shop_id', $shop->id)
+            ->where('status', 'success')
+            ->whereDate('created_at', $date)
+            ->count();
+    }
+@endphp
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <!-- Tambahan Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -101,7 +117,7 @@
                 </div>
             </div>
 
-            <!-- SISI KANAN: GRAFIK KINERJA / ANALISIS TENANT PENGGANTI WD -->
+            <!-- SISI KANAN: GRAFIK KINERJA / ANALISIS TENANT -->
             <div class="card-detail">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                     <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin: 0;">
@@ -110,10 +126,10 @@
                 </div>
 
                 <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">
-                    Visualisasi tren pesanan dan aktivitas operasional toko secara berkala.
+                    Visualisasi tren pesanan dan aktivitas operasional toko selama 7 hari terakhir.
                 </p>
 
-                <!-- Area Grafik Pengganti Riwayat WD -->
+                <!-- Area Grafik Detail Penjualan -->
                 <div style="position: relative; height: 280px; width: 100%; background: rgba(0, 0, 0, 0.2); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);">
                     <canvas id="tenantPerformanceChart"></canvas>
                 </div>
@@ -124,17 +140,19 @@
 </div>
 
 <script>
-    // Inisialisasi Grafik Kinerja Tenant di Halaman Detail
+    // Inisialisasi Grafik Kinerja Tenant di Halaman Detail Menggunakan Data Real
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('tenantPerformanceChart').getContext('2d');
         
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+                // Parsing array label tanggal dari PHP ke Javascript
+                labels: {!! json_encode($labels) !!},
                 datasets: [{
                     label: 'Jumlah Pesanan Berhasil',
-                    data: [5, 12, 8, 15],
+                    // Parsing array total pesanan dari PHP ke Javascript
+                    data: {!! json_encode($dataPesanan) !!},
                     backgroundColor: '#38bdf8',
                     borderRadius: 10
                 }]
@@ -146,8 +164,18 @@
                     legend: { labels: { color: '#fff', font: { size: 11 } } }
                 },
                 scales: {
-                    x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
-                    y: { ticks: { color: '#94a3b8', stepSize: 5 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    x: { 
+                        ticks: { color: '#94a3b8' }, 
+                        grid: { display: false } 
+                    },
+                    y: { 
+                        ticks: { 
+                            color: '#94a3b8', 
+                            stepSize: 1, // Pastikan interval angka sumbu Y berupa bilangan bulat
+                            precision: 0 // Menghindari angka desimal (karena pesanan tidak mungkin berbentuk desimal)
+                        }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' } 
+                    }
                 }
             }
         });
