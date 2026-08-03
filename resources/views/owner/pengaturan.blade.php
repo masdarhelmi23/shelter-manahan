@@ -312,6 +312,7 @@ small{
                 <i class="fas fa-store"></i> Informasi Warung
             </div>
 
+            <!-- UPLOAD LOGO -->
             <div class="logo-box">
                 <div class="logo-preview-wrap">
                     <label>Logo Saat Ini</label>
@@ -331,15 +332,35 @@ small{
                 </div>
             </div>
 
-            <div class="form-group">
+            <!-- UPLOAD QRIS -->
+            <div class="logo-box mt-15">
+                <div class="logo-preview-wrap">
+                    <label>QRIS Saat Ini</label>
+                    <div class="logo-preview">
+                        @if(isset($shop->qris_image) && $shop->qris_image)
+                            <img src="{{ asset('storage/' . $shop->qris_image) }}">
+                        @else
+                            <i class="fas fa-qrcode fa-2x" style="color:rgba(255,255,255,.2);"></i>
+                        @endif
+                    </div>
+                </div>
+
+                <div style="flex:1;">
+                    <label style="color:#ffffff;">Upload QRIS Pembayaran</label>
+                    <input type="file" name="qris_image" class="form-control text-white" accept="image/*">
+                    <small style="color:#cbd5e1;">*Wajib diisi jika menerima pembayaran transfer. Format: JPG, PNG</small>
+                </div>
+            </div>
+
+            <div class="form-group mt-15">
                 <label>Nama Toko / Warung</label>
                 <input type="text" name="nama_toko" class="form-control" value="{{ $shop->name }}" required>
             </div>
 
             <div class="grid-2 mt-15">
                 <div class="form-group">
-                    <label>Nomor WhatsApp (Contoh: 628123xxx)</label>
-                    <input type="text" name="whatsapp" class="form-control" value="{{ $shop->whatsapp }}" placeholder="628...">
+                    <label>Nomor WhatsApp (Wajib untuk konfirmasi)</label>
+                    <input type="text" name="whatsapp" class="form-control" value="{{ $shop->whatsapp }}" placeholder="628..." required>
                 </div>
 
                 <div class="form-group">
@@ -348,11 +369,9 @@ small{
                 </div>
             </div>
 
-            <!-- PENAMBAHAN JAM OPERASIONAL (REVISED VALUE FORMAT) -->
             <div class="grid-2 mt-15">
                 <div class="form-group">
                     <label><i class="fas fa-clock"></i> Jam Buka</label>
-                    {{-- Kita format nilainya ke H:i agar dikenali input type="time" --}}
                     <input type="time" name="jam_buka" class="form-control" 
                         value="{{ $shop->open_time ? \Carbon\Carbon::parse($shop->open_time)->format('H:i') : '' }}">
                 </div>

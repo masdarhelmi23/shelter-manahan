@@ -19,7 +19,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* SHOP HEADER - Blur sedikit ditebalkan agar teks tetap terbaca */
+    /* SHOP HEADER */
     .shop-header { 
         position: relative; 
         padding: 50px 20px 40px; 
@@ -81,7 +81,7 @@
     .btn-qty:hover { background: #ea580c; color: #fff; }
     .input-qty { width: 45px; border: none; background: transparent; text-align: center; font-weight: 800; font-size: 16px; color: #0f172a; }
 
-    /* SIDEBAR RINCIAN (EXECUTIVE STYLE) */
+    /* SIDEBAR RINCIAN */
     .sidebar-rincian { 
         position: sticky; top: 100px; 
         background: rgba(255, 255, 255, 0.95); 
@@ -126,6 +126,10 @@
         text-align: center; margin-bottom: 30px; backdrop-filter: blur(10px);
     }
 
+    /* CUSTOM SWEETALERT UI UNTUK POPUP BARU */
+    .swal2-popup.swal-custom { background: rgba(15, 23, 42, 0.95) !important; backdrop-filter: blur(25px) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 25px !important; color: #fff !important; }
+    .swal2-title { color: #fcd34d !important; font-weight: 900 !important; }
+
     @media (max-width: 1150px) { .main-grid { grid-template-columns: 1fr; } .sidebar-rincian { position: static; margin-bottom: 40px; order: -1; } }
 </style>
 @endsection
@@ -143,7 +147,6 @@
         </div>
         <h1 class="shop-name">{{ $shop->name }}</h1>
 
-        <!-- LOGIKA BUKA TUTUP (OPERASIONAL + MANUAL) -->
         @php
             $now = now();
             $open = \Carbon\Carbon::createFromTimeString($shop->open_time ?? '00:00');
@@ -173,7 +176,6 @@
     </header>
 
     <div class="container">
-        <!-- BANNER PERINGATAN JIKA TUTUP -->
         @if(!$isOpen)
             <div class="closed-banner animate__animated animate__headShake">
                 <i class="fa-solid fa-circle-exclamation"></i> MAAF, SAAT INI WARUNG SEDANG TUTUP. ANDA TIDAK DAPAT MELAKUKAN PEMESANAN.
@@ -182,7 +184,6 @@
 
         <div class="main-grid">
             <div class="menu-side">
-                <!-- DIM MENU JIKA TUTUP -->
                 <div class="grid-menu" style="{{ !$isOpen ? 'opacity: 0.5; pointer-events: none;' : '' }}">
                     @forelse($products as $product)
                         <div class="card-menu">
@@ -216,7 +217,6 @@
                         <i class="fa-solid fa-receipt"></i> RINCIAN PESANAN
                     </div>
 
-                    <!-- IDENTITAS CUSTOMER & JAM KEDATANGAN -->
                     <div style="margin-bottom: 20px;">
                         <label class="label-mewah">Nama Lengkap</label>
                         <input type="text" id="cust_name" class="input-mewah" placeholder="Nama Pemesan" required>
@@ -240,26 +240,21 @@
                         </div>
                     </div>
 
-                    <!-- METODE PEMBAYARAN -->
                     <div style="margin-top: 20px; padding: 15px; background: rgba(248, 250, 252, 0.8); border-radius: 15px; border: 1px solid #e2e8f0;">
                         <label class="label-mewah">Metode Pembayaran</label>
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <label style="color: #0f172a; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;">
                                 <input type="radio" name="payment_method" value="cashier" checked onchange="renderStruk()"> 
-                                Bayar di Kasir (Rp 0)
+                                Bayar di Kasir
                             </label>
                             <label style="color: #0f172a; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;">
                                 <input type="radio" name="payment_method" value="midtrans" onchange="renderStruk()"> 
-                                Transfer / Midtrans (+Rp 2.500)
+                                Transfer / Scan QRIS
                             </label>
                         </div>
                     </div>
 
                     <div class="total-section">
-                        <div style="display: flex; justify-content: space-between; color: #64748b; font-size: 12px; margin-bottom: 5px; font-weight: 600;">
-                            <span>Biaya Admin:</span>
-                            <span id="txt-admin-fee">Rp 0</span>
-                        </div>
                         <div class="total-label">Total Akhir</div>
                         <div class="total-amount" id="struk-total">Rp 0</div>
                     </div>
@@ -274,7 +269,6 @@
 
     <script>
         let keranjangSementara = {};
-        const ADMIN_FEE_MIDTRANS = 2500;
 
         function updateStruk(id, name, price, delta) {
             if ("{{ $isOpen }}" == "" || "{{ $isOpen }}" == "0") return;
@@ -293,9 +287,7 @@
         function renderStruk() {
             const container = document.getElementById('struk-list');
             const totalTxt = document.getElementById('struk-total');
-            const adminFeeTxt = document.getElementById('txt-admin-fee');
             const btnCart = document.getElementById('btn-gas-cart');
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
             
             let html = '';
             let subtotal = 0;
@@ -319,11 +311,7 @@
                 }
             }
 
-            let adminFee = (paymentMethod === 'midtrans') ? ADMIN_FEE_MIDTRANS : 0;
-            let grandTotal = subtotal + adminFee;
-
-            adminFeeTxt.innerText = 'Rp ' + adminFee.toLocaleString('id-ID');
-            totalTxt.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+            totalTxt.innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
 
             if (!adaItem) {
                 container.innerHTML = `<div style="text-align: center; padding: 40px 0; opacity: 0.5; color: #64748b;"><i class="fa-solid fa-basket-shopping fa-3x mb-3"></i><p>Belum ada menu dipilih</p></div>`;
@@ -340,7 +328,6 @@
             const time = document.getElementById('cust_time').value;
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-            // Validasi ketiga input wajib diisi
             if (!name || !wa || !time) {
                 Swal.fire('Perhatian', 'Nama, WhatsApp, dan Jam Kedatangan wajib diisi!', 'warning');
                 return;
@@ -357,7 +344,6 @@
                 didOpen: () => { Swal.showLoading(); } 
             });
 
-            // Trik cerdas: Menambahkan jam kedatangan langsung ke dalam format nama
             const finalCustomerName = name + " (Jam Datang: " + time + " WIB)";
 
             try {
@@ -368,7 +354,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        customer_name: finalCustomerName, // Nama pelanggan yang sudah diselipkan jam
+                        customer_name: finalCustomerName,
                         customer_whatsapp: wa,
                         payment_method: paymentMethod,
                         items: keranjangSementara
@@ -378,20 +364,30 @@
                 const result = await response.json();
                 
                 if(result.success) {
-                    Swal.fire('Berhasil!', 'Pesanan Anda telah diterima.', 'success')
-                    .then(() => {
-                        if(paymentMethod === 'midtrans') {
-                            let url = "{{ route('customer.checkout', [ 'id' => ':id' ]) }}";
-                            window.location.href = url.replace(':id', result.order_id);
-                        } else {
+                    if(paymentMethod === 'midtrans') {
+                        // Jika pilih QRIS, LANGSUNG LOMPAT tanpa popup success
+                        let url = "{{ route('customer.checkout', [ 'id' => ':id' ]) }}";
+                        window.location.href = url.replace(':id', result.order_id);
+                    } else {
+                        // Jika kasir, kasih kata-kata bagus yang menjelaskan
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pesanan Berhasil Masuk!',
+                            html: '<p style="color:#cbd5e1; margin-top:10px;">Pesanan Anda sudah diterima oleh pihak warung.<br><br><b>Silakan tunjukkan riwayat pesanan ini ke kasir</b> saat Anda datang untuk melakukan pembayaran dan pengambilan makanan.</p>',
+                            background: 'rgba(15, 23, 42, 0.95)',
+                            color: '#fff',
+                            confirmButtonColor: '#0ea5e9',
+                            confirmButtonText: 'Lihat Riwayat Pesanan',
+                            customClass: { popup: 'swal-custom' }
+                        }).then(() => {
                             window.location.href = "{{ route('orders.index') }}";
-                        }
-                    });
+                        });
+                    }
                 } else {
                     Swal.fire('Gagal', result.message || 'Terjadi kesalahan', 'error');
                 }
             } catch (e) {
-                Swal.fire('Error', 'Gagal terhubung ke server. Cek koneksi internet dan konfigurasi Midtrans kamu.', 'error');
+                Swal.fire('Error', 'Gagal memproses pesanan. Pastikan koneksi internet Anda stabil.', 'error');
             }
         }
     </script>

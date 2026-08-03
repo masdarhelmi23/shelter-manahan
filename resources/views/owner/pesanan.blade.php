@@ -163,14 +163,14 @@
                                 @csrf @method('PUT')
                                 <input type="hidden" name="status" value="success">
                                 <button type="button" class="btn-aksi btn-update btn-confirm-lunas">
-                                    BAYAR DI KASIR
+                                    SUDAH BAYAR
                                 </button>
                             </form>
                             
                             <!-- JIKA SUDAH LUNAS: TOMBOL SUDAH DITERIMA -->
                             @elseif(in_array($statusOrder, ['success', 'settlement', 'lunas']))
                             <button type="button" class="btn-aksi btn-diterima" onclick="tandaiSelesai(event, {{ $order->id }})">
-                                SUDAH DITERIMA
+                                SUDAH DITERIMA PELANGGAN
                             </button>
                             @endif
                             

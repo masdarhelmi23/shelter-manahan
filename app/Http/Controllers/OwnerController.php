@@ -207,6 +207,7 @@ class OwnerController extends Controller
             'username'  => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,' . $user->id,
             'logo'      => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'qris_image'=> 'nullable|image|mimes:jpg,png,jpeg|max:2048', // Validasi upload gambar QRIS
         ]);
 
         $shop->name = $request->nama_toko;
@@ -214,10 +215,18 @@ class OwnerController extends Controller
         if ($request->filled('jam_buka')) $shop->open_time = $request->jam_buka;
         if ($request->filled('jam_tutup')) $shop->close_time = $request->jam_tutup;
 
+        // Logika simpan gambar Logo
         if ($request->hasFile('logo')) {
             if ($shop->logo) Storage::disk('public')->delete($shop->logo);
             $shop->logo = $request->file('logo')->store('logos', 'public');
         }
+
+        // Logika simpan gambar QRIS
+        if ($request->hasFile('qris_image')) {
+            if ($shop->qris_image) Storage::disk('public')->delete($shop->qris_image);
+            $shop->qris_image = $request->file('qris_image')->store('qris', 'public');
+        }
+        
         $shop->save();
 
         $user->name = $request->username;
@@ -336,8 +345,8 @@ class OwnerController extends Controller
         $year = $parts[0];
         $month = $parts[1];
 
-        // 2. Tambahkan kata 'lunas' agar sesuai dengan tombol yang kamu klik di UI
-        $statusValid = ['success', 'settlement', 'lunas', 'LUNAS', 'Lunas'];
+        // 2. Tambahkan kata 'diterima' agar uang dari pesanan yang disembunyikan tidak hilang
+        $statusValid = ['success', 'settlement', 'lunas', 'LUNAS', 'Lunas', 'diterima', 'DITERIMA'];
 
         // 3. Tarik data pesanan dengan filter status yang baru
         $orders = Order::whereHas('details.product', function ($query) use ($shop) {

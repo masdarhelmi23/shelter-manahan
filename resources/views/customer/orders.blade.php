@@ -148,6 +148,14 @@
 
     .unpaid-bill { background: #fff7ed; color: #ea580c; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; font-weight: 800; border: 1px solid #ffedd5; }
     .paid-bill { background: #f0fdf4; color: #16a34a; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; font-weight: 800; border: 1px solid #dcfce7; }
+    
+    .btn-bayar-sekarang {
+        display: block; width: 100%; margin-top: 15px; padding: 15px; border-radius: 15px;
+        background: #0284c7; color: #fff; font-weight: 800; text-align: center; 
+        text-decoration: none; text-transform: uppercase; transition: 0.3s;
+        box-shadow: 0 10px 20px rgba(2, 132, 199, 0.3);
+    }
+    .btn-bayar-sekarang:hover { background: #0369a1; transform: translateY(-2px); }
 </style>
 @endsection
 
@@ -171,6 +179,13 @@
                 </thead>
                 <tbody>
                     @foreach($groupedOrders as $order)
+                        @php
+                            // MENGHITUNG TOTAL MURNI DARI DETAIL (MENGABAIKAN ADMIN FEE LAMA DI DB)
+                            $pureTotal = 0;
+                            foreach($order->details as $detail) {
+                                $pureTotal += $detail->subtotal;
+                            }
+                        @endphp
                         <tr>
                             <td data-label="Invoice">
                                 <div class="mobile-data-wrapper">
@@ -199,11 +214,13 @@
                             </td>
                             <td data-label="Total">
                                 <div class="mobile-data-wrapper">
-                                    <span class="price-main">Rp {{ number_format($order->amount, 0, ',', '.') }}</span>
+                                    <!-- MENAMPILKAN TOTAL MURNI -->
+                                    <span class="price-main">Rp {{ number_format($pureTotal, 0, ',', '.') }}</span>
                                 </div>
                             </td>
                             <td data-label="Aksi">
-                                <button class="btn-detail" onclick="openNota('{{ $order->order_id }}', '{{ $order->status }}', '{{ $order->payment_method }}', '{{ $order->amount }}', '{{ $order->customer_name }}', '{{ $order->customer_whatsapp }}', {{ json_encode($order->details) }}, '{{ $order->shop->name ?? 'Warung Shelter' }}')">
+                                <!-- PASSING PURE TOTAL KE FUNGSI JAVASCRIPT -->
+                                <button class="btn-detail" onclick="openNota('{{ $order->order_id }}', '{{ $order->status }}', '{{ $order->payment_method }}', '{{ $pureTotal }}', '{{ $order->customer_name }}', '{{ $order->customer_whatsapp }}', {{ json_encode($order->details) }}, '{{ $order->shop->name ?? 'Warung Shelter' }}')">
                                     <i class="fa-solid fa-file-invoice"></i> Lihat Nota
                                 </button>
                             </td>
@@ -225,7 +242,6 @@
 <div class="modal-overlay" id="modalNota" onclick="closeNota(event)">
     <div class="nota-box" onclick="event.stopPropagation()">
         <div class="nota-header">
-            <!-- NAMA TOKO DI HEADER NOTA -->
             <div id="notaShopName" style="font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #fcd34d; margin-bottom: 5px;">NAMA WARUNG</div>
             <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7;">Struk Pembayaran</div>
             <h2 id="notaId" style="font-weight: 900; margin-top: 5px;">#ORDER-ID</h2>
@@ -252,7 +268,7 @@
 
         <div class="nota-footer">
             <div id="notaStatusBox"></div>
-            <button onclick="document.getElementById('modalNota').classList.remove('active')" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 15px; border: none; background: #f1f5f9; color: #475569; font-weight: 800; cursor: pointer; transition: 0.3s;">TUTUP NOTA</button>
+            <button onclick="document.getElementById('modalNota').classList.remove('active')" style="width: 100%; margin-top: 15px; padding: 15px; border-radius: 15px; border: none; background: #f1f5f9; color: #475569; font-weight: 800; cursor: pointer; transition: 0.3s;">TUTUP NOTA</button>
         </div>
     </div>
 </div>
@@ -260,10 +276,10 @@
 <script>
     function openNota(id, status, method, amount, name, wa, details, shopName) {
         document.getElementById('notaId').innerText = '#' + id;
-        document.getElementById('notaShopName').innerText = shopName; // Set Nama Warung
+        document.getElementById('notaShopName').innerText = shopName;
         document.getElementById('notaCustName').innerText = name || '{{ auth()->user()->name }}';
         document.getElementById('notaCustWA').innerText = wa || '-';
-        document.getElementById('notaMethod').innerText = (method === 'midtrans') ? 'Transfer Virtual Account' : 'Tunai di Kasir';
+        document.getElementById('notaMethod').innerText = (method === 'midtrans') ? 'Transfer / QRIS' : 'Tunai di Kasir';
         document.getElementById('notaTotal').innerText = 'Rp ' + parseInt(amount).toLocaleString('id-ID');
 
         let itemsHtml = '';
@@ -278,14 +294,23 @@
 
         const statusBox = document.getElementById('notaStatusBox');
         const notaIcon = document.getElementById('notaIcon');
+        
         if (status === 'pending') {
-            statusBox.innerHTML = `<div class="unpaid-bill">SISA TAGIHAN: Rp ${parseInt(amount).toLocaleString('id-ID')}</div>`;
+            // JIKA BELUM BAYAR, TAMPILKAN TOMBOL MENUJU HALAMAN CHECKOUT
+            let checkoutUrl = "{{ route('customer.checkout', ['id' => ':id']) }}".replace(':id', id);
+            
+            statusBox.innerHTML = `
+                <div class="unpaid-bill">SISA TAGIHAN: Rp ${parseInt(amount).toLocaleString('id-ID')}</div>
+                <a href="${checkoutUrl}" class="btn-bayar-sekarang"><i class="fa-solid fa-arrow-right"></i> LANJUTKAN PEMBAYARAN</a>
+            `;
+            
             notaIcon.className = "fa-solid fa-clock";
-            notaIcon.style.background = "#f59e0b"; // Warna kuning oranye untuk pending
+            notaIcon.style.background = "#ea580c"; 
         } else {
+            // JIKA SUDAH LUNAS, HANYA TAMPILKAN STATUS LUNAS
             statusBox.innerHTML = `<div class="paid-bill">STATUS: TERBAYAR LUNAS</div>`;
             notaIcon.className = "fa-solid fa-circle-check";
-            notaIcon.style.background = "#16a34a"; // Warna hijau untuk lunas
+            notaIcon.style.background = "#16a34a"; 
         }
 
         document.getElementById('modalNota').classList.add('active');
