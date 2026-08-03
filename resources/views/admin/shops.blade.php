@@ -2,6 +2,8 @@
 
 @section('content')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- Tambahan Chart.js untuk Grafik Visual -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
     .management-container { padding: 20px 0; min-height: 100vh; font-family: 'Inter', sans-serif; }
@@ -14,26 +16,34 @@
     .page-header h1 { font-size: 36px; font-weight: 800; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
     .page-header p { color: #fcd34d; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
 
-    /* Ringkasan Total Saldo */
+    /* Layout Grid untuk Widget & Grafik Pengganti Saldo */
+    .dashboard-grid-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
     .summary-card {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-        border: 1px solid rgba(16, 185, 129, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
         padding: 25px;
-        margin-bottom: 30px;
         display: flex;
         align-items: center;
         gap: 20px;
         backdrop-filter: blur(10px);
+        height: 100%;
+        box-sizing: border-box;
     }
     .summary-icon {
         width: 60px; height: 60px;
-        background: #10b981;
+        background: #0284c7;
         color: white;
         border-radius: 15px;
         display: flex; align-items: center; justify-content: center;
         font-size: 24px;
-        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 10px 20px rgba(2, 132, 199, 0.3);
     }
     .summary-info h4 { color: #94a3b8; font-size: 12px; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
     .summary-info h2 { color: #ffffff; font-size: 28px; font-weight: 900; margin: 5px 0 0 0; }
@@ -73,7 +83,6 @@
     
     .custom-table td { padding: 15px 20px; vertical-align: middle; color: #ffffff; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-    /* Logo Toko Styling */
     .table-store-logo {
         width: 50px; height: 50px;
         border-radius: 12px;
@@ -119,70 +128,20 @@
     @media (max-width: 768px) {
         .page-header h1 { font-size: 26px; }
         .page-header p { font-size: 11px; }
-
-        .summary-card { padding: 15px; flex-direction: row; gap: 15px; }
-        .summary-icon { width: 50px; height: 50px; font-size: 20px; }
-        .summary-info h2 { font-size: 20px; }
-
+        .dashboard-grid-top { grid-template-columns: 1fr; }
+        .summary-card { padding: 15px; }
         .luxury-card { padding: 15px; border-radius: 20px; }
 
-        /* Hide Table Header on Mobile */
         .custom-table thead { display: none; }
-        
-        .custom-table, .custom-table tbody, .custom-table tr, .custom-table td {
-            display: block;
-            width: 100%;
-        }
-
-        .custom-table tr {
-            margin-bottom: 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .custom-table td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 5px;
-            text-align: right;
-            border: none !important;
-            font-size: 13px;
-        }
-
-        .custom-table td:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        }
-
-        /* Add Label using Data Attribute */
-        .custom-table td::before {
-            content: attr(data-label);
-            font-weight: 800;
-            color: #fcd34d;
-            text-transform: uppercase;
-            font-size: 10px;
-            text-align: left;
-            margin-right: 10px;
-        }
-
-        /* Spesifik style untuk kolom Identitas Toko di Mobile */
-        .custom-table td[data-label="Identitas Toko"] {
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 10px;
-            padding-top: 5px;
-        }
+        .custom-table, .custom-table tbody, .custom-table tr, .custom-table td { display: block; width: 100%; }
+        .custom-table tr { margin-bottom: 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px; background: rgba(255, 255, 255, 0.03); }
+        .custom-table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; text-align: right; border: none !important; font-size: 13px; }
+        .custom-table td:not(:last-child) { border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important; }
+        .custom-table td::before { content: attr(data-label); font-weight: 800; color: #fcd34d; text-transform: uppercase; font-size: 10px; text-align: left; margin-right: 10px; }
+        .custom-table td[data-label="Identitas Toko"] { flex-direction: column; align-items: flex-end; gap: 10px; padding-top: 5px; }
         .custom-table td[data-label="Identitas Toko"]::before { width: 100%; margin-bottom: 5px; }
-        
-        .custom-table td[data-label="Aksi & Otoritas"] {
-            justify-content: center;
-            padding-top: 20px;
-        }
-
+        .custom-table td[data-label="Aksi & Otoritas"] { justify-content: center; padding-top: 20px; }
         .select-status { max-width: 100%; }
-        .tooltip-text { font-size: 9px; }
     }
 </style>
 
@@ -193,13 +152,22 @@
             <p>Kontrol Otoritas & Status Operasional Shelter Manahan</p>
         </div>
 
-        <div class="summary-card">
-            <div class="summary-icon">
-                <i class="fa-solid fa-vault"></i>
+        <!-- Dashboard Grid Pengganti Saldo (Statistik Toko & Grafik Mini) -->
+        <div class="dashboard-grid-top">
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <div class="summary-info">
+                    <h4>Total Tenant Terdaftar</h4>
+                    <h2>{{ $shops->count() }} Unit Toko</h2>
+                </div>
             </div>
-            <div class="summary-info">
-                <h4>Total Saldo Mengendap (Seluruh Tenant)</h4>
-                <h2>Rp {{ number_format($shops->sum('balance'), 0, ',', '.') }}</h2>
+
+            <div class="summary-card" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+                <div style="width: 100%; height: 70px;">
+                    <canvas id="miniShopChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -217,7 +185,6 @@
                             <th>#</th>
                             <th>Identitas Toko</th>
                             <th>Pemilik Sistem</th>
-                            <th>Saldo (IDR)</th>
                             <th>Status Saat Ini</th>
                             <th style="text-align: center;">Aksi & Otoritas</th>
                         </tr>
@@ -249,9 +216,6 @@
                                     <div style="font-size: 11px; color: #94a3b8;">{{ $shop->user->email ?? '-' }}</div>
                                 </div>
                             </td>
-                            <td data-label="Saldo (IDR)">
-                                <div style="font-weight: 800; color: #4ade80;">Rp {{ number_format($shop->balance ?? 0, 0, ',', '.') }}</div>
-                            </td>
                             <td data-label="Status Saat Ini">
                                 <span class="status-badge {{ $shop->status == 'active' ? 'status-active' : 'status-pending' }}">
                                     {{ $shop->status == 'active' ? 'AKTIF' : 'NON-AKTIF' }}
@@ -278,7 +242,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 60px; color: #94a3b8;">
+                            <td colspan="5" style="text-align: center; padding: 60px; color: #94a3b8;">
                                 <i class="fa-solid fa-database" style="font-size: 40px; display: block; margin-bottom: 20px; opacity: 0.3;"></i>
                                 <span style="font-style: italic;">Tidak ada data toko yang ditemukan.</span>
                             </td>
@@ -286,9 +250,40 @@
                         @endforelse
                     </tbody>
                 </table>
-                <span class="tooltip-text">* Tips: Klik dua kali pada kartu toko untuk melihat riwayat transaksi dan profil lengkap.</span>
+                <span class="tooltip-text">* Tips: Klik dua kali pada kartu toko untuk melihat profil lengkap.</span>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Script Chart.js untuk visualisasi status toko di halaman index
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('miniShopChart').getContext('2d');
+        const activeCount = "{{ $shops->where('status', 'active')->count() }}";
+        const pendingCount = "{{ $shops->where('status', 'pending')->count() }}";
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Aktif', 'Non-Aktif'],
+                datasets: [{
+                    label: 'Jumlah Toko',
+                    data: [activeCount, pendingCount],
+                    backgroundColor: ['#4ade80', '#fbbf24'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#fff', font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#fff', font: { size: 10 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+    });
+</script>
 @endsection

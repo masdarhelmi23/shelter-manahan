@@ -89,6 +89,18 @@
                 </div>
             </div>
 
+            <!-- UPLOAD QRIS TAMBAHAN -->
+            <div class="upload-logo-wrapper">
+                <div class="preview-logo-box" id="qrisPreview">
+                    <i class="fas fa-qrcode" style="color: #475569; font-size: 24px;"></i>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 8px;">Upload QRIS Pembayaran</label>
+                    <input type="file" name="qris_image" class="input-mewah" accept="image/*" onchange="previewQris(this)">
+                    <small style="color: #64748b; font-size: 10px; margin-top: 5px; display: block;">* Wajib diisi untuk menerima pembayaran Customer. Format: JPG, PNG</small>
+                </div>
+            </div>
+
             <div class="form-group-mewah">
                 <label>Nama Toko / Shelter NO..</label>
                 <input type="text" name="name" class="input-mewah" placeholder="Contoh: Shelter 1 'Bakso Kawi'" required>
@@ -123,12 +135,25 @@
     </div>
 
     <script>
+        // Preview Logo
         function previewImage(input) {
             const preview = document.getElementById('logoPreview');
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.innerHTML = `<img src="${e.target.result}" alt="Logo Preview">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Preview QRIS
+        function previewQris(input) {
+            const preview = document.getElementById('qrisPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="QRIS Preview">`;
                 }
                 reader.readAsDataURL(input.files[0]);
             }
